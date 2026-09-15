@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inbox — testmail.app viewer</title>
+    <script>
+        (function () {
+            var stored = null;
+            try { stored = localStorage.getItem("theme"); } catch (e) {}
+            var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.dataset.theme = stored || (prefersDark ? "dark" : "light");
+        })();
+    </script>
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/index.css" />
+</head>
+
+<body>
+    <button id="theme-toggle-btn" class="btn btn--icon theme-toggle" aria-label="Switch to dark theme">
+        <svg class="icon" aria-hidden="true">
+            <use id="theme-toggle-icon" href="assets/img/icons/icons.svg#icon-moon"></use>
+        </svg>
+    </button>
+
+    <main class="landing">
+        <section class="hero fade-in">
+            <div class="hero__icon" aria-hidden="true">
+                <svg class="icon icon--lg">
+                    <use href="assets/img/icons/icons.svg#icon-mail"></use>
+                </svg>
+            </div>
+
+            <h1 class="hero__title">A simple inbox for your test emails</h1>
+
+            <p class="hero__lede">
+                This tool reads mail straight from your
+                <a href="https://testmail.app" target="_blank" rel="noopener">testmail.app</a>
+                namespace and shows it in a clean, minimal inbox — no clutter, no
+                setup beyond your own API key.
+            </p>
+
+            <p class="hero__body">
+                testmail.app hands out disposable email addresses under a namespace
+                you control, so you can send test emails to a tag like
+                <code>yournamespace.tag@inbox.testmail.app</code> and read them
+                back through a JSON API. This app is a lightweight, personal
+                front end for exactly that: sign in, generate a tag, and watch
+                mail land in the inbox below.
+            </p>
+
+            <ul class="feature-list">
+                <li class="feature-list__item">
+                    <svg class="icon icon--sm" aria-hidden="true">
+                        <use href="assets/img/icons/icons.svg#icon-tag"></use>
+                    </svg>
+                    <span>Generate custom or auto-sequenced tags on demand</span>
+                </li>
+                <li class="feature-list__item">
+                    <svg class="icon icon--sm" aria-hidden="true">
+                        <use href="assets/img/icons/icons.svg#icon-search"></use>
+                    </svg>
+                    <span>Search across tag and subject to find a message fast</span>
+                </li>
+                <li class="feature-list__item">
+                    <svg class="icon icon--sm" aria-hidden="true">
+                        <use href="assets/img/icons/icons.svg#icon-refresh"></use>
+                    </svg>
+                    <span>Manual refresh — nothing is fetched or stored unless you ask</span>
+                </li>
+            </ul>
+
+            <button id="get-started" class="btn hero__cta" disabled>
+                <span id="get-started-label" class="visually-hidden">Loading</span>
+                <span id="get-started-skeleton" class="skeleton-text" aria-hidden="true"></span>
+            </button>
+        </section>
+    </main>
+
+    <script type="module" src="assets/js/modules/theme.js"></script>
+    <script type="module" src="assets/js/index.js"></script>
+</body>
+
+</html>

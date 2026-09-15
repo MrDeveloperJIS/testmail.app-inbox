@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <script>
+        (function () {
+            var stored = null;
+            try { stored = localStorage.getItem("theme"); } catch (e) {}
+            var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.dataset.theme = stored || (prefersDark ? "dark" : "light");
+        })();
+    </script>
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/profile.css" />
+</head>
+
+<body>
+    <button id="theme-toggle-btn" class="btn btn--icon theme-toggle" aria-label="Switch to dark theme">
+        <svg class="icon" aria-hidden="true">
+            <use id="theme-toggle-icon" href="assets/img/icons/icons.svg#icon-moon"></use>
+        </svg>
+    </button>
+
+    <main class="profile-page">
+        <a href="home.html" class="back-link">
+            <svg class="icon icon--sm" aria-hidden="true">
+                <use href="assets/img/icons/icons.svg#icon-chevron-left"></use>
+            </svg>
+            Inbox
+        </a>
+
+        <section class="profile-card fade-in">
+            <div class="profile-card__header">
+                <h1 class="profile-card__title">Profile</h1>
+                <div class="profile-actions">
+                    <button id="edit-btn" class="btn btn--icon" aria-label="Edit profile">
+                        <svg class="icon" aria-hidden="true">
+                            <use href="assets/img/icons/icons.svg#icon-edit"></use>
+                        </svg>
+                    </button>
+                    <div id="edit-actions" class="edit-actions" hidden>
+                        <button id="cancel-btn" class="btn btn--icon" aria-label="Cancel">
+                            <svg class="icon" aria-hidden="true">
+                                <use href="assets/img/icons/icons.svg#icon-cancel"></use>
+                            </svg>
+                        </button>
+                        <button id="save-btn" class="btn btn--icon" aria-label="Save">
+                            <svg class="icon" aria-hidden="true">
+                                <use href="assets/img/icons/icons.svg#icon-save"></use>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile-error" class="profile-error" role="alert" hidden></div>
+
+            <form id="profile-form" class="profile-fields">
+                <div class="profile-field">
+                    <span class="profile-field__label">Name</span>
+                    <div class="profile-field__stack">
+                        <span id="name-value" class="profile-field__value"></span>
+                        <input id="name-input" class="profile-field__input input" type="text" autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="profile-field">
+                    <span class="profile-field__label">API key</span>
+                    <div class="profile-field__stack">
+                        <span id="api-value" class="profile-field__value"></span>
+                        <input id="api-input" class="profile-field__input input" type="text" autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="profile-field">
+                    <span class="profile-field__label">Namespace</span>
+                    <div class="profile-field__stack">
+                        <span id="namespace-value" class="profile-field__value"></span>
+                        <input id="namespace-input" class="profile-field__input input" type="text" autocomplete="off" />
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <section class="profile-card fade-in">
+            <h2 class="profile-card__subtitle">Overview</h2>
+
+            <div class="overview-stat">
+                <span class="overview-stat__label">Sequel tags generated</span>
+                <span id="sequel-count" class="overview-stat__value">0</span>
+            </div>
+
+            <div class="custom-tags">
+                <span class="profile-field__label">Custom tags</span>
+                <ul id="custom-tags-list" class="custom-tags__list"></ul>
+                <p id="custom-tags-empty" class="custom-tags__empty">No custom tags yet.</p>
+            </div>
+        </section>
+
+        <button id="sign-out-btn" class="btn btn--ghost sign-out-btn">
+            <svg class="icon icon--sm" aria-hidden="true">
+                <use href="assets/img/icons/icons.svg#icon-sign-out"></use>
+            </svg>
+            Sign out
+        </button>
+    </main>
+
+    <script type="module" src="assets/js/modules/theme.js"></script>
+    <script type="module" src="assets/js/profile.js"></script>
+</body>
+
+</html>

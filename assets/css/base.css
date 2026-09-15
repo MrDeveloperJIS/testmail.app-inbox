@@ -1,0 +1,275 @@
+/* ==========================================================================
+   base.css — root variables, resets, shared utility classes
+   Every other CSS file references var(--...) tokens only. No new raw hex
+   values should be introduced outside this file.
+   ========================================================================== */
+
+:root {
+    /* Core palette */
+    --color-bg: #f0f8ff;
+    --color-fg: #0c0c0c;
+
+    /* Greyscale shades (light → dark), derived from the two anchors */
+    --grey-50: #fbfdff;
+    --grey-100: #e9eef2;
+    --grey-200: #d3dade;
+    --grey-300: #a9b1b6;
+    --grey-400: #7a8288;
+    --grey-500: #52585c;
+    --grey-600: #34383b;
+    --grey-700: #212426;
+    --grey-800: #161819;
+    --grey-900: #0c0c0c;
+
+    /* Semantic tokens (build components against these, not raw colors) */
+    --surface: var(--color-bg);
+    --surface-alt: var(--grey-100);
+    --border: var(--grey-200);
+    --text-primary: var(--color-fg);
+    --text-secondary: var(--grey-500);
+    --accent: var(--grey-800);
+    /* used sparingly for active/primary buttons */
+    --danger: #7a2f2f;
+    /* muted, stays inside greyscale-adjacent feel */
+    --backdrop: rgba(12, 12, 12, 0.4);
+    /* modal backdrop overlay */
+
+    /* Spacing scale */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+
+    /* Type scale */
+    --font-size-sm: 0.8125rem;
+    --font-size-base: 0.9375rem;
+    --font-size-md: 1.0625rem;
+    --font-size-lg: 1.375rem;
+    --font-size-xl: 1.75rem;
+
+    /* Radius / motion */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-fast: 120ms;
+    --dur-base: 200ms;
+
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ---- Dark theme -------------------------------------------------------
+   Toggled via [data-theme="dark"] on <html>, set by modules/theme.js and
+   persisted to localStorage. A tiny inline script in each page's <head>
+   applies the stored/system preference before first paint (no FOUC).
+   Only the two core anchors + greyscale ramp are redefined here — every
+   semantic token below (--surface, --border, --text-primary, --accent,
+   etc.) re-derives automatically since they're all var() references
+   resolved against the current cascade, not fixed values. */
+:root[data-theme="dark"] {
+    --color-bg: #0c0c0c;
+    --color-fg: #f0f8ff;
+
+    --grey-50: #141617;
+    --grey-100: #1b1e1f;
+    --grey-200: #2b2f31;
+    --grey-300: #3f4447;
+    --grey-400: #5a6165;
+    --grey-500: #848c91;
+    --grey-600: #a9b1b6;
+    --grey-700: #cdd3d6;
+    --grey-800: #e9eef2;
+    --grey-900: #f0f8ff;
+
+    --backdrop: rgba(0, 0, 0, 0.6);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Guarantees the `hidden` attribute always wins, even when a component's
+   own class also sets `display` (e.g. `display: flex`) — without this,
+   normal author rules of equal specificity beat the UA's [hidden] rule. */
+[hidden] {
+    display: none !important;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color var(--dur-base) var(--ease),
+        color var(--dur-base) var(--ease);
+}
+
+img,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+}
+
+/* ---- Shared utility classes ------------------------------------------- */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    color: currentColor;
+    flex-shrink: 0;
+}
+
+.icon--sm {
+    width: 16px;
+    height: 16px;
+}
+
+.icon--lg {
+    width: 28px;
+    height: 28px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--surface);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    transition: transform var(--dur-fast) var(--ease),
+        background var(--dur-fast) var(--ease);
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn--ghost {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn--icon {
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+.btn--icon:hover {
+    background: var(--surface-alt);
+    color: var(--text-primary);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.input {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-base);
+    transition: border-color var(--dur-fast) var(--ease);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--grey-500);
+}
+
+/* Standalone theme toggle — fixed top-right on pages with no top bar of
+   their own (index, auth, profile). home.html places its toggle inline
+   in the topbar instead, so .topbar__action's own layout wins there. */
+.theme-toggle {
+    position: fixed;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 10;
+}
+
+.fade-in {
+    animation: fade-in var(--dur-base) var(--ease);
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.spin {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}

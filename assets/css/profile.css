@@ -1,0 +1,189 @@
+/* profile.css — profile page. References base.css tokens only. */
+
+.profile-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    align-self: flex-start;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+}
+
+.back-link:hover {
+    color: var(--text-primary);
+}
+
+.profile-card {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.profile-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.profile-card__title {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.profile-card__subtitle {
+    margin: 0;
+    font-size: var(--font-size-md);
+    font-weight: 600;
+}
+
+.profile-actions {
+    display: flex;
+    align-items: center;
+}
+
+.edit-actions {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.profile-error {
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    font-size: var(--font-size-sm);
+}
+
+.profile-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.profile-field__label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* Cross-fade between the read-only value and the editable input (§10) —
+   both occupy the same grid cell and swap via opacity, avoiding an
+   abrupt DOM replace. */
+.profile-field__stack {
+    display: grid;
+    align-items: center;
+}
+
+.profile-field__value,
+.profile-field__input {
+    grid-area: 1 / 1;
+    transition: opacity var(--dur-base) var(--ease);
+}
+
+.profile-field__value {
+    padding: var(--space-2) var(--space-3);
+    min-height: 1.4em;
+    opacity: 1;
+    word-break: break-all;
+}
+
+.profile-field__input {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.profile-field.is-editing .profile-field__value {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.profile-field.is-editing .profile-field__input {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.overview-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3);
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+}
+
+.overview-stat__label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.overview-stat__value {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+}
+
+.custom-tags {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.custom-tags__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.custom-tags__list li {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-sm);
+    border-bottom: 1px solid var(--border);
+}
+
+.custom-tags__list li:last-child {
+    border-bottom: none;
+}
+
+.custom-tags__empty {
+    margin: 0;
+    padding: var(--space-3);
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+}
+
+.sign-out-btn {
+    width: 100%;
+    max-width: 420px;
+}
