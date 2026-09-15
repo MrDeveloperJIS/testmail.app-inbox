@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inbox</title>
+    <script>
+        (function () {
+            var stored = null;
+            try { stored = localStorage.getItem("theme"); } catch (e) {}
+            var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.dataset.theme = stored || (prefersDark ? "dark" : "light");
+        })();
+    </script>
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/home.css" />
+</head>
+
+<body>
+    <div class="home-page">
+        <header class="topbar">
+            <button id="new-tag-btn" class="btn btn--icon topbar__action" aria-label="New tag">
+                <svg class="icon" aria-hidden="true">
+                    <use href="assets/img/icons/icons.svg#icon-add"></use>
+                </svg>
+            </button>
+
+            <button id="refresh-btn" class="btn btn--icon topbar__action" aria-label="Refresh inbox">
+                <svg id="refresh-icon" class="icon" aria-hidden="true">
+                    <use href="assets/img/icons/icons.svg#icon-refresh"></use>
+                </svg>
+            </button>
+
+            <label class="topbar__search">
+                <svg class="icon icon--sm" aria-hidden="true">
+                    <use href="assets/img/icons/icons.svg#icon-search"></use>
+                </svg>
+                <input id="search-input" type="search" class="topbar__search-input" placeholder="Search tag or subject" aria-label="Search messages" />
+            </label>
+
+            <button id="theme-toggle-btn" class="btn btn--icon topbar__action" aria-label="Switch to dark theme">
+                <svg class="icon" aria-hidden="true">
+                    <use id="theme-toggle-icon" href="assets/img/icons/icons.svg#icon-moon"></use>
+                </svg>
+            </button>
+
+            <a href="profile.html" class="btn btn--icon topbar__action topbar__profile" aria-label="Profile">
+                <svg class="icon" aria-hidden="true">
+                    <use href="assets/img/icons/icons.svg#icon-user"></use>
+                </svg>
+            </a>
+        </header>
+
+        <div id="inbox-banner" class="inbox-banner" role="alert" hidden></div>
+
+        <main class="inbox">
+            <section class="inbox__list-pane" aria-label="Messages">
+                <ul id="message-list" class="message-list"></ul>
+
+                <div id="inbox-empty" class="inbox-empty">
+                    <svg class="icon icon--lg" aria-hidden="true">
+                        <use href="assets/img/icons/icons.svg#icon-mail"></use>
+                    </svg>
+                    <p id="inbox-empty-text">No messages yet — hit refresh to check your inbox.</p>
+                </div>
+            </section>
+
+            <section class="inbox__reader-pane" aria-label="Selected message">
+                <div id="reader-empty" class="reader-empty">
+                    <p>Select a message to read it</p>
+                </div>
+
+                <article id="reader-content" class="reader-content" hidden>
+                    <header class="reader-content__header">
+                        <h2 id="reader-subject" class="reader-content__subject"></h2>
+                        <dl class="reader-meta">
+                            <div class="reader-meta__row">
+                                <dt>From</dt>
+                                <dd id="reader-from"></dd>
+                            </div>
+                            <div class="reader-meta__row">
+                                <dt>Tag</dt>
+                                <dd id="reader-tag"></dd>
+                            </div>
+                            <div class="reader-meta__row">
+                                <dt>Received</dt>
+                                <dd id="reader-timestamp"></dd>
+                            </div>
+                        </dl>
+                        <div class="view-toggle" role="group" aria-label="View message as">
+                            <button id="view-html-btn" class="view-toggle__btn" aria-pressed="true">HTML</button>
+                            <button id="view-text-btn" class="view-toggle__btn" aria-pressed="false">Text</button>
+                        </div>
+                    </header>
+
+                    <iframe id="reader-iframe" class="reader-iframe" sandbox="allow-same-origin" title="Message body"></iframe>
+                    <pre id="reader-text" class="reader-text" hidden></pre>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <!-- New Tag popup -->
+    <div id="tag-modal-backdrop" class="modal-backdrop" hidden>
+        <div id="tag-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="tag-modal-title">
+            <div class="modal__header">
+                <h2 id="tag-modal-title" class="modal__title">New tag</h2>
+                <button id="tag-modal-close" class="btn btn--icon" aria-label="Close">
+                    <svg class="icon" aria-hidden="true">
+                        <use href="assets/img/icons/icons.svg#icon-close"></use>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="tag-modal-tabs" class="modal-tabs" role="tablist">
+                <button id="tab-custom" class="modal-tabs__tab" role="tab" aria-selected="true" aria-controls="panel-custom">
+                    Custom
+                </button>
+                <button id="tab-sequel" class="modal-tabs__tab" role="tab" aria-selected="false" aria-controls="panel-sequel">
+                    Sequel
+                </button>
+            </div>
+
+            <div id="panel-custom" class="modal-panel" role="tabpanel">
+                <label class="field">
+                    <span class="modal-panel__label">Tag name</span>
+                    <input id="custom-tag-input" class="input modal-panel__input" type="text" placeholder="e.g. invoice" autocomplete="off" />
+                </label>
+                <p id="custom-tag-hint" class="modal-panel__hint" hidden></p>
+                <button id="custom-tag-create" class="btn modal-panel__submit">Create</button>
+            </div>
+
+            <div id="panel-sequel" class="modal-panel" role="tabpanel" hidden>
+                <p class="modal-panel__label">Next tag</p>
+                <p id="sequel-preview" class="modal-panel__preview">…</p>
+                <button id="sequel-tag-create" class="btn modal-panel__submit">Create</button>
+            </div>
+
+            <div id="panel-created" class="modal-panel" hidden>
+                <p class="modal-panel__label">Address created</p>
+                <div class="created-address">
+                    <code id="created-address-text" class="created-address__text"></code>
+                    <button id="copy-address-btn" class="btn btn--icon" aria-label="Copy address">
+                        <svg class="icon icon--sm" aria-hidden="true">
+                            <use href="assets/img/icons/icons.svg#icon-copy"></use>
+                        </svg>
+                    </button>
+                </div>
+                <p id="copy-feedback" class="copy-feedback" aria-live="polite"></p>
+                <button id="tag-modal-done" class="btn modal-panel__submit">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="assets/js/modules/theme.js"></script>
+    <script type="module" src="assets/js/home.js"></script>
+</body>
+
+</html>
