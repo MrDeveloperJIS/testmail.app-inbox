@@ -5,31 +5,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inbox — testmail.app viewer</title>
-    <script>
-        (function () {
-            var stored = null;
-            try { stored = localStorage.getItem("theme"); } catch (e) {}
-            var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-            document.documentElement.dataset.theme = stored || (prefersDark ? "dark" : "light");
-        })();
-    </script>
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
     <link rel="stylesheet" href="assets/css/base.css" />
     <link rel="stylesheet" href="assets/css/index.css" />
 </head>
 
 <body>
-    <button id="theme-toggle-btn" class="btn btn--icon theme-toggle" aria-label="Switch to dark theme">
-        <svg class="icon" aria-hidden="true">
-            <use id="theme-toggle-icon" href="assets/img/icons/icons.svg#icon-moon"></use>
-        </svg>
-    </button>
-
     <main class="landing">
         <section class="hero fade-in">
             <div class="hero__icon" aria-hidden="true">
-                <svg class="icon icon--lg">
-                    <use href="assets/img/icons/icons.svg#icon-mail"></use>
-                </svg>
+                <img class="icon icon--lg" src="assets/img/icons/mail.svg" alt="" />
             </div>
 
             <h1 class="hero__title">A simple inbox for your test emails</h1>
@@ -52,21 +37,15 @@
 
             <ul class="feature-list">
                 <li class="feature-list__item">
-                    <svg class="icon icon--sm" aria-hidden="true">
-                        <use href="assets/img/icons/icons.svg#icon-tag"></use>
-                    </svg>
+                    <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/tag.svg" alt="" />
                     <span>Generate custom or auto-sequenced tags on demand</span>
                 </li>
                 <li class="feature-list__item">
-                    <svg class="icon icon--sm" aria-hidden="true">
-                        <use href="assets/img/icons/icons.svg#icon-search"></use>
-                    </svg>
+                    <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/search.svg" alt="" />
                     <span>Search across tag and subject to find a message fast</span>
                 </li>
                 <li class="feature-list__item">
-                    <svg class="icon icon--sm" aria-hidden="true">
-                        <use href="assets/img/icons/icons.svg#icon-refresh"></use>
-                    </svg>
+                    <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/refresh.svg" alt="" />
                     <span>Manual refresh — nothing is fetched or stored unless you ask</span>
                 </li>
             </ul>
@@ -78,7 +57,6 @@
         </section>
     </main>
 
-    <script type="module" src="assets/js/modules/theme.js"></script>
     <script type="module" src="assets/js/index.js"></script>
 </body>
 

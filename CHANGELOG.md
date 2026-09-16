@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-09-16
+
+### Changed
+
+- **Theme** — dropped light/dark switching; the app is dark-only now. Removed
+  the toggle button and the pre-paint theme-detection script from every
+  page, and the `[data-theme="dark"]` override in `base.css` (its values
+  are just the `:root` defaults now).
+- **Icons** — stopped using the `icons.svg` `<symbol>` sprite referenced via
+  `<use href="...#icon-x">`. Every icon is now a plain `<img src="assets/img/icons/name.svg">`
+  pointing straight at its own file. Since an `<img>` can't inherit
+  `currentColor` from page CSS, the icon files themselves now carry a fixed
+  stroke/fill color instead. The password show/hide toggle on the auth page
+  works by swapping which of two `<img>` tags is `hidden`, instead of
+  swapping one element's `href`.
+
+### Added
+
+- **Favicon** — `assets/img/favicon.svg`, an envelope on a dark
+  rounded-square background, linked on all four pages.
+
+### Removed
+
+- `assets/js/modules/theme.js`, `assets/img/icons/icons.svg`,
+  `assets/img/icons/sun.svg`, `assets/img/icons/moon.svg` — no longer
+  referenced by anything.
+
 ## [1.1.0] - 2026-09-15
 
 ### Added
@@ -52,5 +79,3 @@ Initial release.
   `icons.svg` sprite.
 - Static HTML/CSS/JS site (no build step, no framework), structured
   for GitHub Pages hosting.
-
-[1.0.0]: #

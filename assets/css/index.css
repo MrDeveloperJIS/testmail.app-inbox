@@ -76,7 +76,7 @@
 }
 
 .feature-list__item .icon {
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 .hero__cta {

@@ -5,25 +5,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign in — Inbox</title>
-    <script>
-        (function () {
-            var stored = null;
-            try { stored = localStorage.getItem("theme"); } catch (e) {}
-            var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-            document.documentElement.dataset.theme = stored || (prefersDark ? "dark" : "light");
-        })();
-    </script>
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
     <link rel="stylesheet" href="assets/css/base.css" />
     <link rel="stylesheet" href="assets/css/auth.css" />
 </head>
 
 <body>
-    <button id="theme-toggle-btn" class="btn btn--icon theme-toggle" aria-label="Switch to dark theme">
-        <svg class="icon" aria-hidden="true">
-            <use id="theme-toggle-icon" href="assets/img/icons/icons.svg#icon-moon"></use>
-        </svg>
-    </button>
-
     <main class="auth-page">
         <form id="auth-form" class="auth-card fade-in" novalidate>
             <h1 class="auth-card__title">Sign in</h1>
@@ -40,9 +27,8 @@
                 <div class="password-field">
                     <input type="password" id="password" name="password" class="input" autocomplete="current-password" required />
                     <button type="button" id="toggle-password" class="btn btn--icon password-field__toggle" aria-label="Show password" aria-pressed="false">
-                        <svg class="icon" aria-hidden="true">
-                            <use id="toggle-password-icon" href="assets/img/icons/icons.svg#icon-eye"></use>
-                        </svg>
+                        <img id="icon-eye" class="icon" aria-hidden="true" src="assets/img/icons/eye.svg" alt="" />
+                        <img id="icon-eye-off" class="icon" aria-hidden="true" hidden src="assets/img/icons/eye-off.svg" alt="" />
                     </button>
                 </div>
             </label>
@@ -53,7 +39,6 @@
         </form>
     </main>
 
-    <script type="module" src="assets/js/modules/theme.js"></script>
     <script type="module" src="assets/js/auth.js"></script>
 </body>
 

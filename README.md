@@ -21,8 +21,7 @@ no build step, no framework, just HTML/CSS/JS hosted on GitHub Pages.
 - **Profile** — view/edit your name, testmail API key (masked by default),
   and namespace; see your custom tag history and how many sequel tags
   you've generated.
-- **Light/dark theme**, applied before first paint to avoid a flash of the
-  wrong theme, with a toggle on every page.
+- **Dark theme only**, no toggle or light-mode branch.
 
 ## Tech stack
 
@@ -60,9 +59,8 @@ testmail.app-inbox/
     │       ├── testmail-api.js   # testmail.app fetch wrapper
     │       ├── tag-generator.js  # sequel tag generation/rollover
     │       ├── auth-guard.js     # redirect-if-signed-(in|out) helper
-    │       ├── theme.js          # light/dark toggle
     │       └── utils.js          # debounce, escapeHtml, date formatting, masking
-    └── img/icons/                # hand-rolled SVGs + icons.svg sprite
+    └── img/icons/                # hand-rolled SVGs, referenced directly (no sprite)
 ```
 
 ## Setup

@@ -14,7 +14,8 @@ const errorBox = document.getElementById("auth-error");
 const submitBtn = document.getElementById("submit-btn");
 const submitLabel = document.getElementById("submit-label");
 const togglePasswordBtn = document.getElementById("toggle-password");
-const togglePasswordIcon = document.getElementById("toggle-password-icon");
+const eyeIcon = document.getElementById("icon-eye");
+const eyeOffIcon = document.getElementById("icon-eye-off");
 
 // --- Password show/hide toggle -------------------------------------------
 
@@ -23,12 +24,8 @@ let passwordVisible = false;
 togglePasswordBtn.addEventListener("click", () => {
     passwordVisible = !passwordVisible;
     passwordInput.type = passwordVisible ? "text" : "password";
-    togglePasswordIcon.setAttribute(
-        "href",
-        passwordVisible
-            ? "assets/img/icons/icons.svg#icon-eye-off"
-            : "assets/img/icons/icons.svg#icon-eye"
-    );
+    eyeIcon.hidden = passwordVisible;
+    eyeOffIcon.hidden = !passwordVisible;
     togglePasswordBtn.setAttribute("aria-pressed", String(passwordVisible));
     togglePasswordBtn.setAttribute(
         "aria-label",

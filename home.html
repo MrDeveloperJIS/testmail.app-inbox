@@ -5,14 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inbox</title>
-    <script>
-        (function () {
-            var stored = null;
-            try { stored = localStorage.getItem("theme"); } catch (e) { }
-            var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-            document.documentElement.dataset.theme = stored || (prefersDark ? "dark" : "light");
-        })();
-    </script>
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
     <link rel="stylesheet" href="assets/css/base.css" />
     <link rel="stylesheet" href="assets/css/home.css" />
 </head>
@@ -21,40 +14,24 @@
     <div class="home-page">
         <header class="topbar">
             <button id="new-tag-btn" class="btn btn--icon topbar__action" aria-label="New tag">
-                <svg class="icon" aria-hidden="true">
-                    <use href="assets/img/icons/icons.svg#icon-add"></use>
-                </svg>
+                <img class="icon" aria-hidden="true" src="assets/img/icons/add.svg" alt="" />
             </button>
 
             <button id="demo-tag-btn" class="btn btn--icon topbar__action" aria-label="Show demo address">
-                <svg class="icon" aria-hidden="true">
-                    <use href="assets/img/icons/icons.svg#icon-tag"></use>
-                </svg>
+                <img class="icon" aria-hidden="true" src="assets/img/icons/tag.svg" alt="" />
             </button>
 
             <button id="refresh-btn" class="btn btn--icon topbar__action" aria-label="Refresh inbox">
-                <svg id="refresh-icon" class="icon" aria-hidden="true">
-                    <use href="assets/img/icons/icons.svg#icon-refresh"></use>
-                </svg>
+                <img id="refresh-icon" class="icon" aria-hidden="true" src="assets/img/icons/refresh.svg" alt="" />
             </button>
 
             <label class="topbar__search">
-                <svg class="icon icon--sm" aria-hidden="true">
-                    <use href="assets/img/icons/icons.svg#icon-search"></use>
-                </svg>
+                <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/search.svg" alt="" />
                 <input id="search-input" type="search" class="topbar__search-input" placeholder="Search tag or subject" aria-label="Search messages" />
             </label>
 
-            <button id="theme-toggle-btn" class="btn btn--icon topbar__action" aria-label="Switch to dark theme">
-                <svg class="icon" aria-hidden="true">
-                    <use id="theme-toggle-icon" href="assets/img/icons/icons.svg#icon-moon"></use>
-                </svg>
-            </button>
-
             <a href="profile.html" class="btn btn--icon topbar__action topbar__profile" aria-label="Profile">
-                <svg class="icon" aria-hidden="true">
-                    <use href="assets/img/icons/icons.svg#icon-user"></use>
-                </svg>
+                <img class="icon" aria-hidden="true" src="assets/img/icons/user.svg" alt="" />
             </a>
         </header>
 
@@ -65,9 +42,7 @@
                 <ul id="message-list" class="message-list"></ul>
 
                 <div id="inbox-empty" class="inbox-empty">
-                    <svg class="icon icon--lg" aria-hidden="true">
-                        <use href="assets/img/icons/icons.svg#icon-mail"></use>
-                    </svg>
+                    <img class="icon icon--lg" aria-hidden="true" src="assets/img/icons/mail.svg" alt="" />
                     <p id="inbox-empty-text">No messages yet — hit refresh to check your inbox.</p>
                 </div>
             </section>
@@ -113,9 +88,7 @@
             <div class="modal__header">
                 <h2 id="tag-modal-title" class="modal__title">New tag</h2>
                 <button id="tag-modal-close" class="btn btn--icon" aria-label="Close">
-                    <svg class="icon" aria-hidden="true">
-                        <use href="assets/img/icons/icons.svg#icon-close"></use>
-                    </svg>
+                    <img class="icon" aria-hidden="true" src="assets/img/icons/close.svg" alt="" />
                 </button>
             </div>
 
@@ -148,9 +121,7 @@
                 <div class="created-address">
                     <code id="created-address-text" class="created-address__text"></code>
                     <button id="copy-address-btn" class="btn btn--icon" aria-label="Copy address">
-                        <svg class="icon icon--sm" aria-hidden="true">
-                            <use href="assets/img/icons/icons.svg#icon-copy"></use>
-                        </svg>
+                        <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/copy.svg" alt="" />
                     </button>
                 </div>
                 <p id="copy-feedback" class="copy-feedback" aria-live="polite"></p>
@@ -165,9 +136,7 @@
             <div class="modal__header">
                 <h2 id="demo-modal-title" class="modal__title">Your demo address</h2>
                 <button id="demo-modal-close" class="btn btn--icon" aria-label="Close">
-                    <svg class="icon" aria-hidden="true">
-                        <use href="assets/img/icons/icons.svg#icon-close"></use>
-                    </svg>
+                    <img class="icon" aria-hidden="true" src="assets/img/icons/close.svg" alt="" />
                 </button>
             </div>
 
@@ -176,9 +145,7 @@
                 <div class="created-address">
                     <code id="demo-address-text" class="created-address__text"></code>
                     <button id="demo-copy-btn" class="btn btn--icon" aria-label="Copy address">
-                        <svg class="icon icon--sm" aria-hidden="true">
-                            <use href="assets/img/icons/icons.svg#icon-copy"></use>
-                        </svg>
+                        <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/copy.svg" alt="" />
                     </button>
                 </div>
                 <p id="demo-copy-feedback" class="copy-feedback" aria-live="polite"></p>
@@ -186,7 +153,6 @@
         </div>
     </div>
 
-    <script type="module" src="assets/js/modules/theme.js"></script>
     <script type="module" src="assets/js/home.js"></script>
 </body>
 

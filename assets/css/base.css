@@ -5,34 +5,31 @@
    ========================================================================== */
 
 :root {
-    /* Core palette */
-    --color-bg: #f0f8ff;
-    --color-fg: #0c0c0c;
+    /* Core palette — dark theme only */
+    --color-bg: #0c0c0c;
+    --color-fg: #f0f8ff;
 
-    /* Greyscale shades (light → dark), derived from the two anchors */
-    --grey-50: #fbfdff;
-    --grey-100: #e9eef2;
-    --grey-200: #d3dade;
-    --grey-300: #a9b1b6;
-    --grey-400: #7a8288;
-    --grey-500: #52585c;
-    --grey-600: #34383b;
-    --grey-700: #212426;
-    --grey-800: #161819;
-    --grey-900: #0c0c0c;
+    /* Greyscale shades, derived from the two anchors */
+    --grey-50: #141617;
+    --grey-100: #1b1e1f;
+    --grey-200: #2b2f31;
+    --grey-300: #3f4447;
+    --grey-400: #5a6165;
+    --grey-500: #848c91;
+    --grey-600: #a9b1b6;
+    --grey-700: #cdd3d6;
+    --grey-800: #e9eef2;
+    --grey-900: #f0f8ff;
 
-    /* Semantic tokens (build components against these, not raw colors) */
+    /* Semantic tokens */
     --surface: var(--color-bg);
     --surface-alt: var(--grey-100);
     --border: var(--grey-200);
     --text-primary: var(--color-fg);
     --text-secondary: var(--grey-500);
     --accent: var(--grey-800);
-    /* used sparingly for active/primary buttons */
     --danger: #7a2f2f;
-    /* muted, stays inside greyscale-adjacent feel */
-    --backdrop: rgba(12, 12, 12, 0.4);
-    /* modal backdrop overlay */
+    --backdrop: #00000099;
 
     /* Spacing scale */
     --space-1: 4px;
@@ -57,32 +54,6 @@
     --dur-base: 200ms;
 
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-}
-
-/* ---- Dark theme -------------------------------------------------------
-   Toggled via [data-theme="dark"] on <html>, set by modules/theme.js and
-   persisted to localStorage. A tiny inline script in each page's <head>
-   applies the stored/system preference before first paint (no FOUC).
-   Only the two core anchors + greyscale ramp are redefined here — every
-   semantic token below (--surface, --border, --text-primary, --accent,
-   etc.) re-derives automatically since they're all var() references
-   resolved against the current cascade, not fixed values. */
-:root[data-theme="dark"] {
-    --color-bg: #0c0c0c;
-    --color-fg: #f0f8ff;
-
-    --grey-50: #141617;
-    --grey-100: #1b1e1f;
-    --grey-200: #2b2f31;
-    --grey-300: #3f4447;
-    --grey-400: #5a6165;
-    --grey-500: #848c91;
-    --grey-600: #a9b1b6;
-    --grey-700: #cdd3d6;
-    --grey-800: #e9eef2;
-    --grey-900: #f0f8ff;
-
-    --backdrop: rgba(0, 0, 0, 0.6);
 }
 
 *,
@@ -153,7 +124,7 @@ a {
 .icon {
     width: 20px;
     height: 20px;
-    color: currentColor;
+    color: var(--color-fg);
     flex-shrink: 0;
 }
 
@@ -196,7 +167,7 @@ a {
     padding: var(--space-2);
     border-radius: var(--radius-sm);
     background: transparent;
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 .btn--icon:hover {
@@ -223,16 +194,6 @@ a {
 .input:focus {
     outline: none;
     border-color: var(--grey-500);
-}
-
-/* Standalone theme toggle — fixed top-right on pages with no top bar of
-   their own (index, auth, profile). home.html places its toggle inline
-   in the topbar instead, so .topbar__action's own layout wins there. */
-.theme-toggle {
-    position: fixed;
-    top: var(--space-4);
-    right: var(--space-4);
-    z-index: 10;
 }
 
 .fade-in {
