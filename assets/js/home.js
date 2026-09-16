@@ -21,6 +21,7 @@ const SEARCH_DEBOUNCE_MS = 180;
 // ---- DOM refs --------------------------------------------------------------
 
 const newTagBtn = document.getElementById("new-tag-btn");
+const demoTagBtn = document.getElementById("demo-tag-btn");
 const refreshBtn = document.getElementById("refresh-btn");
 const refreshIcon = document.getElementById("refresh-icon");
 const searchInput = document.getElementById("search-input");
@@ -61,6 +62,12 @@ const createdAddressText = document.getElementById("created-address-text");
 const copyAddressBtn = document.getElementById("copy-address-btn");
 const copyFeedback = document.getElementById("copy-feedback");
 const tagModalDoneBtn = document.getElementById("tag-modal-done");
+
+const demoModalBackdrop = document.getElementById("demo-modal-backdrop");
+const demoModalCloseBtn = document.getElementById("demo-modal-close");
+const demoAddressText = document.getElementById("demo-address-text");
+const demoCopyBtn = document.getElementById("demo-copy-btn");
+const demoCopyFeedback = document.getElementById("demo-copy-feedback");
 
 // ---- State -------------------------------------------------------------
 
@@ -270,7 +277,6 @@ viewTextBtn.addEventListener("click", () => setReaderView("text"));
 function openModal() {
     lastFocusedBeforeModal = document.activeElement;
     modalBackdrop.hidden = false;
-    document.addEventListener("keydown", handleModalKeydown);
     switchTab("custom");
     loadExistingCustomTags();
     customTagInput.focus();
@@ -278,18 +284,10 @@ function openModal() {
 
 function closeModal() {
     modalBackdrop.hidden = true;
-    document.removeEventListener("keydown", handleModalKeydown);
     resetModalFields();
     if (lastFocusedBeforeModal) lastFocusedBeforeModal.focus();
 }
 
-function handleModalKeydown(e) {
-    if (e.key === "Escape") closeModal();
-}
-
-modalBackdrop.addEventListener("click", (e) => {
-    if (e.target === modalBackdrop) closeModal();
-});
 modalCloseBtn.addEventListener("click", closeModal);
 tagModalDoneBtn.addEventListener("click", closeModal);
 newTagBtn.addEventListener("click", openModal);
@@ -423,3 +421,63 @@ copyAddressBtn.addEventListener("click", async () => {
         copyFeedback.textContent = "Couldn't copy — select and copy manually.";
     }
 });
+// =========================================================================
+// "demo" tag address popup
+//
+// Dismiss policy differs from the New Tag modal on purpose: this one closes
+// only via its close button — no backdrop click, no Esc.
+// =========================================================================
+
+const DEMO_TAG = "demo";
+
+let lastFocusedBeforeDemoModal = null;
+
+function demoAddress() {
+    return profile.namespace
+        ? `${profile.namespace}.${DEMO_TAG}@inbox.testmail.app`
+        : "";
+}
+
+function openDemoModal() {
+    lastFocusedBeforeDemoModal = document.activeElement;
+
+    const address = demoAddress();
+    demoAddressText.textContent =
+        address || "Add your namespace in Profile first.";
+    demoCopyBtn.disabled = !address;
+    demoCopyFeedback.textContent = "";
+
+    demoModalBackdrop.hidden = false;
+    demoModalCloseBtn.focus();
+}
+
+function closeDemoModal() {
+    demoModalBackdrop.hidden = true;
+    demoCopyFeedback.textContent = "";
+    if (lastFocusedBeforeDemoModal) lastFocusedBeforeDemoModal.focus();
+}
+
+if (!demoTagBtn || !demoModalBackdrop) {
+    // Stale home.html (markup missing) — skip wiring rather than throwing,
+    // which would kill every listener registered after this point.
+    console.warn("Demo address popup markup not found — skipping setup.");
+} else {
+    demoTagBtn.addEventListener("click", openDemoModal);
+    demoModalCloseBtn.addEventListener("click", closeDemoModal);
+
+    demoCopyBtn.addEventListener("click", async () => {
+        const address = demoAddress();
+        if (!address) return;
+
+        try {
+            await navigator.clipboard.writeText(address);
+            demoCopyFeedback.textContent = "Copied!";
+            setTimeout(() => {
+                demoCopyFeedback.textContent = "";
+            }, 1500);
+        } catch (err) {
+            demoCopyFeedback.textContent =
+                "Couldn't copy — select and copy manually.";
+        }
+    });
+}

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-09-15
+
+### Added
+
+- **Quick "demo" address** — a tag button in the inbox top bar opens a
+  popup showing the full `{namespace}.demo@inbox.testmail.app` address
+  with a copy button. Unlike the New Tag modal, this popup is dismissed
+  only by its close button (backdrop clicks and `Esc` are ignored).
+
+### Changed
+
+- **New Tag modal** — no longer closes on backdrop click or `Esc`; only
+  its close button or the "Done" button (after tag creation) dismiss it
+  now — same dismissal behavior as the "demo" address popup.
+
 ## [1.0.0] - 2026-09-15
 
 Initial release.

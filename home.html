@@ -8,7 +8,7 @@
     <script>
         (function () {
             var stored = null;
-            try { stored = localStorage.getItem("theme"); } catch (e) {}
+            try { stored = localStorage.getItem("theme"); } catch (e) { }
             var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
             document.documentElement.dataset.theme = stored || (prefersDark ? "dark" : "light");
         })();
@@ -23,6 +23,12 @@
             <button id="new-tag-btn" class="btn btn--icon topbar__action" aria-label="New tag">
                 <svg class="icon" aria-hidden="true">
                     <use href="assets/img/icons/icons.svg#icon-add"></use>
+                </svg>
+            </button>
+
+            <button id="demo-tag-btn" class="btn btn--icon topbar__action" aria-label="Show demo address">
+                <svg class="icon" aria-hidden="true">
+                    <use href="assets/img/icons/icons.svg#icon-tag"></use>
                 </svg>
             </button>
 
@@ -149,6 +155,33 @@
                 </div>
                 <p id="copy-feedback" class="copy-feedback" aria-live="polite"></p>
                 <button id="tag-modal-done" class="btn modal-panel__submit">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- "demo" tag address popup (close button only — no backdrop dismiss) -->
+    <div id="demo-modal-backdrop" class="modal-backdrop" hidden>
+        <div id="demo-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="demo-modal-title">
+            <div class="modal__header">
+                <h2 id="demo-modal-title" class="modal__title">Your demo address</h2>
+                <button id="demo-modal-close" class="btn btn--icon" aria-label="Close">
+                    <svg class="icon" aria-hidden="true">
+                        <use href="assets/img/icons/icons.svg#icon-close"></use>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-panel">
+                <p class="modal-panel__label">Send test mail to</p>
+                <div class="created-address">
+                    <code id="demo-address-text" class="created-address__text"></code>
+                    <button id="demo-copy-btn" class="btn btn--icon" aria-label="Copy address">
+                        <svg class="icon icon--sm" aria-hidden="true">
+                            <use href="assets/img/icons/icons.svg#icon-copy"></use>
+                        </svg>
+                    </button>
+                </div>
+                <p id="demo-copy-feedback" class="copy-feedback" aria-live="polite"></p>
             </div>
         </div>
     </div>
