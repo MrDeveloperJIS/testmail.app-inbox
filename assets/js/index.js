@@ -10,7 +10,7 @@ const getStartedLabel = document.getElementById("get-started-label");
 let destination = null;
 
 onAuthStateChanged(auth, (user) => {
-    destination = user ? "home.html" : "auth.html";
+    destination = user ? "inbox.html" : "auth.html";
     getStartedLabel.textContent = "Get started";
     getStartedBtn.disabled = false;
 });

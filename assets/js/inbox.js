@@ -1,4 +1,4 @@
-// home.js — core inbox page.
+// inbox.js — core inbox page.
 
 import { auth, db, rtdb } from "./firebase-config.js";
 import { requireAuth } from "./modules/auth-guard.js";
@@ -458,7 +458,7 @@ function closeDemoModal() {
 }
 
 if (!demoTagBtn || !demoModalBackdrop) {
-    // Stale home.html (markup missing) — skip wiring rather than throwing,
+    // Stale inbox.html (markup missing) — skip wiring rather than throwing,
     // which would kill every listener registered after this point.
     console.warn("Demo address popup markup not found — skipping setup.");
 } else {

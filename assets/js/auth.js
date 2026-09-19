@@ -4,8 +4,8 @@ import { auth } from "./firebase-config.js";
 import { redirectIfSignedIn } from "./modules/auth-guard.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
-// If already signed in (e.g. via back button), skip straight to home.html.
-redirectIfSignedIn("home.html");
+// If already signed in (e.g. via back button), skip straight to inbox.html.
+redirectIfSignedIn("inbox.html");
 
 const form = document.getElementById("auth-form");
 const emailInput = document.getElementById("email");
@@ -77,7 +77,7 @@ form.addEventListener("submit", async (event) => {
     setSubmitting(true);
     try {
         await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "home.html";
+        window.location.href = "inbox.html";
     } catch (err) {
         const message = ERROR_MESSAGES[err.code] || "Couldn't sign in — try again.";
         showError(message);

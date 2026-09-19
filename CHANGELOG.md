@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-09-19
+
+### Changed
+
+- **Inbox page renamed** — `home.html` is now `inbox.html`, with its
+  stylesheet and script renamed to match (`assets/css/inbox.css`,
+  `assets/js/inbox.js`). The page wrapper class `.home-page` became
+  `.inbox-page`. Sign-in redirects (`auth.js`, `index.js`) and the
+  `redirectIfSignedIn` default in `auth-guard.js` now point at
+  `inbox.html`; comments and the README file tree were updated too. Any
+  old `home.html` bookmark will 404.
+- **Profile back link** — now uses the `mail.svg` icon (with
+  `alt="Inbox"`) instead of a chevron.
+
+### Removed
+
+- `assets/img/icons/chevron-left.svg` — no longer referenced by anything.
+
 ## [1.2.0] - 2026-09-16
 
 ### Changed

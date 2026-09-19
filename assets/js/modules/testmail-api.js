@@ -1,6 +1,6 @@
 // modules/testmail-api.js
 // Thin fetch wrapper around the testmail.app JSON API. GET-only, query-param
-// auth. Called only from home.js.
+// auth. Called only from inbox.js.
 
 const BASE_URL = "https://api.testmail.app/api/json";
 const GENERIC_UNREACHABLE_MESSAGE = "Couldn't reach testmail.app — try again.";

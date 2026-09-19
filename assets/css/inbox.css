@@ -1,6 +1,6 @@
-/* home.css — core inbox page. References base.css tokens only. */
+/* inbox.css — core inbox page. References base.css tokens only. */
 
-.home-page {
+.inbox-page {
     display: flex;
     flex-direction: column;
     height: 100vh;

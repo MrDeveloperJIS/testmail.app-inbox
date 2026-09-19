@@ -40,20 +40,20 @@ testmail.app-inbox/
 │
 ├── index.html
 ├── auth.html
-├── home.html
+├── inbox.html
 ├── profile.html
 └── assets/
     ├── css/
     │   ├── base.css              # design tokens
     │   ├── index.css
     │   ├── auth.css
-    │   ├── home.css
+    │   ├── inbox.css
     │   └── profile.css
     ├── js/
     │   ├── firebase-config.js    # firebase init
     │   ├── index.js
     │   ├── auth.js
-    │   ├── home.js
+    │   ├── inbox.js
     │   ├── profile.js
     │   └── modules/
     │       ├── testmail-api.js   # testmail.app fetch wrapper

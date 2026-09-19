@@ -1,6 +1,6 @@
 // modules/auth-guard.js
 // Shared "redirect if not signed in" (and inverse) helper.
-// Centralizes onAuthStateChanged boilerplate used by home.js, profile.js
+// Centralizes onAuthStateChanged boilerplate used by inbox.js, profile.js
 // (requireAuth) and auth.js (redirectIfSignedIn).
 
 import { auth } from "../firebase-config.js";
@@ -28,7 +28,7 @@ export function requireAuth(onSignedIn) {
  * @param {string} destination
  * @returns {() => void} unsubscribe function
  */
-export function redirectIfSignedIn(destination = "home.html") {
+export function redirectIfSignedIn(destination = "inbox.html") {
     return onAuthStateChanged(auth, (user) => {
         if (user) window.location.href = destination;
     });
