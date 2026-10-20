@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-10-20
+
+### Added
+
+- **Inbox: "To" field** — the reader header now lists From, To, Tag and
+  Received. To uses testmail.app's parsed recipient list, falling back to the
+  raw `to` / `envelope_to` strings and finally `namespace.tag@inbox.testmail.app`.
+- **Custom scrollbars** — thin, rounded, transparent-track scrollbars with
+  hover/active states, defined once in `base.css` via `--scrollbar-*` tokens
+  (WebKit pseudo-elements, with standard `scrollbar-*` properties for Firefox).
+  The email iframe receives the same styling.
+
+### Changed
+
+- **Profile page** restyled to match the landing page: centred 480px column,
+  icon/title/lede hero, surface-alt detail tiles, and tag tiles with the tag
+  icon. Edit mode now uses the floating-label input from the sign-in page.
+  Hidden fields are removed from the tab order while not editing.
+- **`.float-field`** (floating-label input) moved from `auth.css` to
+  `base.css` so the profile page can share it; `auth.css` keeps only the
+  password-toggle parts.
+- **Reader meta** is now a two-column label/value grid so values align and
+  long addresses wrap cleanly.
+
 ## [1.3.0] - 2026-09-19
 
 ### Changed

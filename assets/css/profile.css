@@ -1,12 +1,20 @@
-/* profile.css — profile page. References base.css tokens only. */
+/* profile.css — profile page. References base.css tokens only.
+   Mirrors the landing page: one centred column, secondary-coloured hero,
+   surface-alt tiles. Edit mode reuses the shared .float-field component. */
 
 .profile-page {
     min-height: 100vh;
     display: flex;
+    justify-content: center;
+    padding: var(--space-6) var(--space-5);
+}
+
+.profile {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-5);
+    gap: var(--space-5);
 }
 
 .back-link {
@@ -14,43 +22,59 @@
     align-items: center;
     gap: var(--space-1);
     align-self: flex-start;
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
     color: var(--text-secondary);
     font-size: var(--font-size-sm);
     text-decoration: none;
+    transition: color var(--dur-fast) var(--ease);
 }
 
 .back-link:hover {
     color: var(--text-primary);
 }
 
-.profile-card {
-    width: 100%;
-    max-width: 420px;
+/* ---- Hero (same rhythm as index.css .hero) ------------------------------ */
+
+.profile__hero {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: var(--space-4);
-    padding: var(--space-5);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    text-align: center;
 }
 
-.profile-card__header {
+.profile__icon {
+    color: var(--text-secondary);
+}
+
+.profile__title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.profile__lede {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-md);
+}
+
+/* ---- Panels ------------------------------------------------------------- */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.panel__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    min-height: 36px;
 }
 
-.profile-card__title {
-    margin: 0;
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-}
-
-.profile-card__subtitle {
+.panel__title {
     margin: 0;
     font-size: var(--font-size-md);
     font-weight: 600;
@@ -74,103 +98,126 @@
     font-size: var(--font-size-sm);
 }
 
-.profile-fields {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-}
+/* ---- Detail rows (tile style from .feature-list__item) ------------------ */
 
-.profile-field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-}
-
-.profile-field__label {
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--text-secondary);
-}
-
-/* Cross-fade between the read-only value and the editable input (§10) —
-   both occupy the same grid cell and swap via opacity, avoiding an
-   abrupt DOM replace. */
-.profile-field__stack {
-    display: grid;
-    align-items: center;
-}
-
-.profile-field__value,
-.profile-field__input {
-    grid-area: 1 / 1;
-    transition: opacity var(--dur-base) var(--ease);
-}
-
-.profile-field__value {
-    padding: var(--space-2) var(--space-3);
-    min-height: 1.4em;
-    opacity: 1;
-    word-break: break-all;
-}
-
-.profile-field__input {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.profile-field.is-editing .profile-field__value {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.profile-field.is-editing .profile-field__input {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.overview-stat {
+.detail-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-4);
     padding: var(--space-3);
     background: var(--surface-alt);
     border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
 }
 
-.overview-stat__label {
-    font-size: var(--font-size-sm);
+.detail-row__label {
+    flex-shrink: 0;
     color: var(--text-secondary);
 }
 
-.overview-stat__value {
+.detail-row__value {
+    min-width: 0;
+    font-size: var(--font-size-base);
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.detail-row__value--strong {
     font-size: var(--font-size-md);
     font-weight: 600;
 }
+
+/* ---- Editable fields ------------------------------------------------------
+   The read-only tile and the floating-label input share one grid cell, so
+   toggling edit mode cross-fades without any layout shift. `visibility`
+   (delayed until the fade ends) keeps the hidden one out of the tab order. */
+
+.profile-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.profile-field {
+    display: grid;
+}
+
+.profile-field__view,
+.profile-field__edit {
+    grid-area: 1 / 1;
+}
+
+.profile-field__view {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--dur-base) var(--ease),
+        visibility 0s linear 0s;
+}
+
+.profile-field__edit {
+    align-items: stretch;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--dur-base) var(--ease),
+        visibility 0s linear var(--dur-base);
+}
+
+.profile-field.is-editing .profile-field__view {
+    opacity: 0;
+    visibility: hidden;
+    transition-delay: 0s, var(--dur-base);
+}
+
+.profile-field.is-editing .profile-field__edit {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s, 0s;
+}
+
+/* ---- Custom tags ---------------------------------------------------------- */
 
 .custom-tags {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+
+.custom-tags__label {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
 }
 
 .custom-tags__list {
     list-style: none;
     margin: 0;
     padding: 0;
-    max-height: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-height: 240px;
     overflow-y: auto;
-    border: 1px solid var(--border);
+    overscroll-behavior: contain;
+}
+
+/* Leave breathing room so the scrollbar never touches the tiles. */
+@supports selector(::-webkit-scrollbar) {
+    .custom-tags__list {
+        padding-right: var(--space-1);
+    }
+}
+
+.custom-tags__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--surface-alt);
     border-radius: var(--radius-sm);
-}
-
-.custom-tags__list li {
-    padding: var(--space-2) var(--space-3);
     font-size: var(--font-size-sm);
-    border-bottom: 1px solid var(--border);
-}
-
-.custom-tags__list li:last-child {
-    border-bottom: none;
+    overflow-wrap: anywhere;
 }
 
 .custom-tags__empty {
@@ -183,7 +230,10 @@
     border-radius: var(--radius-sm);
 }
 
+/* ---- Sign out ------------------------------------------------------------- */
+
 .sign-out-btn {
-    width: 100%;
-    max-width: 420px;
+    align-self: center;
+    min-width: 160px;
+    min-height: 42px;
 }

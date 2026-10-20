@@ -27,36 +27,18 @@
     text-align: center;
 }
 
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    font-size: var(--font-size-sm);
+.float-field__input--toggle {
+    padding-right: calc(var(--space-6) + var(--space-3));
 }
 
-.field__label {
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.password-field {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.password-field .input {
-    padding-right: calc(var(--space-6) + var(--space-2));
-}
-
-.password-field__toggle {
+.float-field__toggle {
     position: absolute;
     right: var(--space-1);
     top: 50%;
     transform: translateY(-50%);
 }
 
-.password-field__toggle:active {
+.float-field__toggle:active {
     transform: translateY(-50%) scale(0.94);
 }
 

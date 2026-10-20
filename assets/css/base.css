@@ -196,6 +196,109 @@ a {
     border-color: var(--grey-500);
 }
 
+/* ---- Scrollbars --------------------------------------------------------
+   Thin, rounded, transparent-track scrollbars that follow the greyscale.
+   Chromium/Safari get the ::-webkit-scrollbar version (adds hover/active
+   states); Firefox gets the standard scrollbar-* properties. The @supports
+   block resets the standard properties for WebKit engines, since Chrome
+   121+ would otherwise ignore the pseudo-elements when they are set. */
+
+:root {
+    --scrollbar-size: 10px;
+    --scrollbar-thumb: var(--grey-300);
+    --scrollbar-thumb-hover: var(--grey-400);
+    --scrollbar-thumb-active: var(--grey-500);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+@supports selector(::-webkit-scrollbar) {
+    * {
+        scrollbar-width: auto;
+        scrollbar-color: auto;
+    }
+
+    ::-webkit-scrollbar {
+        width: var(--scrollbar-size);
+        height: var(--scrollbar-size);
+    }
+
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        min-height: 40px;
+        background: var(--scrollbar-thumb);
+        border: 3px solid transparent;
+        border-radius: 999px;
+        background-clip: padding-box;
+        transition: background-color var(--dur-fast) var(--ease);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--scrollbar-thumb-hover);
+        background-clip: padding-box;
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+        background: var(--scrollbar-thumb-active);
+        background-clip: padding-box;
+    }
+}
+
+/* Floating-label field: the label reads as a placeholder inside the input,
+   then lifts onto the top border line on focus or when the input has a value.
+   The input keeps placeholder=" " so :placeholder-shown can detect "empty". */
+
+.float-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.float-field__input {
+    padding: var(--space-3);
+}
+
+.float-field__label {
+    position: absolute;
+    left: var(--space-2);
+    top: 50%;
+    max-width: calc(100% - var(--space-5));
+    padding: 0 var(--space-1);
+    transform: translateY(-50%);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    transition: top var(--dur-fast) var(--ease),
+        font-size var(--dur-fast) var(--ease),
+        color var(--dur-fast) var(--ease);
+}
+
+/* Floated: on focus, when filled, or when the browser autofills. */
+.float-field__input:focus~.float-field__label,
+.float-field__input:not(:placeholder-shown)~.float-field__label,
+.float-field__input:-webkit-autofill~.float-field__label {
+    top: 0;
+    background: var(--surface);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.float-field__input:focus~.float-field__label {
+    color: var(--text-primary);
+}
+
 .fade-in {
     animation: fade-in var(--dur-base) var(--ease);
 }

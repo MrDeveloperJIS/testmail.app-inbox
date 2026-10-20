@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Profile</title>
+    <title>Profile — Inbox</title>
     <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
     <link rel="stylesheet" href="assets/css/base.css" />
     <link rel="stylesheet" href="assets/css/profile.css" />
@@ -12,77 +12,98 @@
 
 <body>
     <main class="profile-page">
-        <a href="inbox.html" class="back-link">
-            <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/mail.svg" alt="Inbox" />
-            Inbox
-        </a>
+        <div class="profile fade-in">
+            <a href="inbox.html" class="back-link">
+                <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/mail.svg" alt="" />
+                Inbox
+            </a>
 
-        <section class="profile-card fade-in">
-            <div class="profile-card__header">
-                <h1 class="profile-card__title">Profile</h1>
-                <div class="profile-actions">
-                    <button id="edit-btn" class="btn btn--icon" aria-label="Edit profile">
-                        <img class="icon" aria-hidden="true" src="assets/img/icons/edit.svg" alt="" />
-                    </button>
-                    <div id="edit-actions" class="edit-actions" hidden>
-                        <button id="cancel-btn" class="btn btn--icon" aria-label="Cancel">
-                            <img class="icon" aria-hidden="true" src="assets/img/icons/cancel.svg" alt="" />
+            <header class="profile__hero">
+                <div class="profile__icon" aria-hidden="true">
+                    <img class="icon icon--lg" src="assets/img/icons/user.svg" alt="" />
+                </div>
+                <h1 class="profile__title">Profile</h1>
+                <p class="profile__lede">Your testmail.app credentials and tag activity.</p>
+            </header>
+
+            <section class="panel" aria-labelledby="account-title">
+                <div class="panel__header">
+                    <h2 id="account-title" class="panel__title">Account</h2>
+                    <div class="profile-actions">
+                        <button id="edit-btn" class="btn btn--icon" aria-label="Edit profile" title="Edit">
+                            <img class="icon" aria-hidden="true" src="assets/img/icons/edit.svg" alt="" />
                         </button>
-                        <button id="save-btn" class="btn btn--icon" aria-label="Save">
-                            <img class="icon" aria-hidden="true" src="assets/img/icons/save.svg" alt="" />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="profile-error" class="profile-error" role="alert" hidden></div>
-
-            <form id="profile-form" class="profile-fields">
-                <div class="profile-field">
-                    <span class="profile-field__label">Name</span>
-                    <div class="profile-field__stack">
-                        <span id="name-value" class="profile-field__value"></span>
-                        <input id="name-input" class="profile-field__input input" type="text" autocomplete="off" />
+                        <div id="edit-actions" class="edit-actions" hidden>
+                            <button id="cancel-btn" class="btn btn--icon" aria-label="Cancel" title="Cancel">
+                                <img class="icon" aria-hidden="true" src="assets/img/icons/cancel.svg" alt="" />
+                            </button>
+                            <button id="save-btn" class="btn btn--icon" aria-label="Save" title="Save">
+                                <img class="icon" aria-hidden="true" src="assets/img/icons/save.svg" alt="" />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="profile-field">
-                    <span class="profile-field__label">API key</span>
-                    <div class="profile-field__stack">
-                        <span id="api-value" class="profile-field__value"></span>
-                        <input id="api-input" class="profile-field__input input" type="text" autocomplete="off" />
+                <div id="profile-error" class="profile-error" role="alert" hidden></div>
+
+                <form id="profile-form" class="profile-fields" novalidate>
+                    <div class="profile-field">
+                        <div class="profile-field__view detail-row">
+                            <span class="detail-row__label">Name</span>
+                            <span id="name-value" class="detail-row__value"></span>
+                        </div>
+                        <div class="profile-field__edit float-field">
+                            <input id="name-input" class="input float-field__input" type="text" placeholder=" " autocomplete="off" />
+                            <label for="name-input" class="float-field__label">Name</label>
+                        </div>
                     </div>
+
+                    <div class="profile-field">
+                        <div class="profile-field__view detail-row">
+                            <span class="detail-row__label">API key</span>
+                            <span id="api-value" class="detail-row__value"></span>
+                        </div>
+                        <div class="profile-field__edit float-field">
+                            <input id="api-input" class="input float-field__input" type="text" placeholder=" " autocomplete="off" />
+                            <label for="api-input" class="float-field__label">API key</label>
+                        </div>
+                    </div>
+
+                    <div class="profile-field">
+                        <div class="profile-field__view detail-row">
+                            <span class="detail-row__label">Namespace</span>
+                            <span id="namespace-value" class="detail-row__value"></span>
+                        </div>
+                        <div class="profile-field__edit float-field">
+                            <input id="namespace-input" class="input float-field__input" type="text" placeholder=" " autocomplete="off" />
+                            <label for="namespace-input" class="float-field__label">Namespace</label>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel" aria-labelledby="overview-title">
+                <div class="panel__header">
+                    <h2 id="overview-title" class="panel__title">Overview</h2>
                 </div>
 
-                <div class="profile-field">
-                    <span class="profile-field__label">Namespace</span>
-                    <div class="profile-field__stack">
-                        <span id="namespace-value" class="profile-field__value"></span>
-                        <input id="namespace-input" class="profile-field__input input" type="text" autocomplete="off" />
-                    </div>
+                <div class="detail-row">
+                    <span class="detail-row__label">Sequel tags generated</span>
+                    <span id="sequel-count" class="detail-row__value detail-row__value--strong">0</span>
                 </div>
-            </form>
-        </section>
 
-        <section class="profile-card fade-in">
-            <h2 class="profile-card__subtitle">Overview</h2>
+                <div class="custom-tags">
+                    <span class="custom-tags__label">Custom tags</span>
+                    <ul id="custom-tags-list" class="custom-tags__list"></ul>
+                    <p id="custom-tags-empty" class="custom-tags__empty">No custom tags yet.</p>
+                </div>
+            </section>
 
-            <div class="overview-stat">
-                <span class="overview-stat__label">Sequel tags generated</span>
-                <span id="sequel-count" class="overview-stat__value">0</span>
-            </div>
-
-            <div class="custom-tags">
-                <span class="profile-field__label">Custom tags</span>
-                <ul id="custom-tags-list" class="custom-tags__list"></ul>
-                <p id="custom-tags-empty" class="custom-tags__empty">No custom tags yet.</p>
-            </div>
-        </section>
-
-        <button id="sign-out-btn" class="btn btn--ghost sign-out-btn">
-            <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/sign-out.svg" alt="" />
-            Sign out
-        </button>
+            <button id="sign-out-btn" class="btn btn--ghost sign-out-btn">
+                <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/sign-out.svg" alt="" />
+                Sign out
+            </button>
+        </div>
     </main>
 
     <script type="module" src="assets/js/profile.js"></script>

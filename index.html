@@ -20,33 +20,44 @@
             <h1 class="hero__title">A simple inbox for your test emails</h1>
 
             <p class="hero__lede">
-                This tool reads mail straight from your
+                Read mail from your
                 <a href="https://testmail.app" target="_blank" rel="noopener">testmail.app</a>
-                namespace and shows it in a clean, minimal inbox — no clutter, no
-                setup beyond your own API key.
+                namespace in a clean, minimal inbox. All you need is your own
+                API key.
             </p>
 
-            <p class="hero__body">
-                testmail.app hands out disposable email addresses under a namespace
-                you control, so you can send test emails to a tag like
-                <code>yournamespace.tag@inbox.testmail.app</code> and read them
-                back through a JSON API. This app is a lightweight, personal
-                front end for exactly that: sign in, generate a tag, and watch
-                mail land in the inbox below.
-            </p>
+            <div class="hero__address" aria-label="Example address">
+                <span class="hero__address-label">Send test mail to</span>
+                <code class="hero__address-text">namespace.<span class="hero__address-tag">tag</span>@inbox.testmail.app</code>
+            </div>
 
             <ul class="feature-list">
                 <li class="feature-list__item">
-                    <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/tag.svg" alt="" />
-                    <span>Generate custom or auto-sequenced tags on demand</span>
+                    <span class="feature-list__icon" aria-hidden="true">
+                        <img class="icon icon--sm" src="assets/img/icons/tag.svg" alt="" />
+                    </span>
+                    <span class="feature-list__text">
+                        <strong>Generate tags</strong>
+                        Custom names or auto-sequenced ones, on demand
+                    </span>
                 </li>
                 <li class="feature-list__item">
-                    <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/search.svg" alt="" />
-                    <span>Search across tag and subject to find a message fast</span>
+                    <span class="feature-list__icon" aria-hidden="true">
+                        <img class="icon icon--sm" src="assets/img/icons/search.svg" alt="" />
+                    </span>
+                    <span class="feature-list__text">
+                        <strong>Find mail fast</strong>
+                        Search across tag and subject instantly
+                    </span>
                 </li>
                 <li class="feature-list__item">
-                    <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/refresh.svg" alt="" />
-                    <span>Manual refresh — nothing is fetched or stored unless you ask</span>
+                    <span class="feature-list__icon" aria-hidden="true">
+                        <img class="icon icon--sm" src="assets/img/icons/refresh.svg" alt="" />
+                    </span>
+                    <span class="feature-list__text">
+                        <strong>Refresh on your terms</strong>
+                        Nothing is fetched until you ask, and messages are never stored
+                    </span>
                 </li>
             </ul>
 

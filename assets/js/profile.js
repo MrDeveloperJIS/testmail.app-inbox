@@ -182,7 +182,18 @@ function renderCustomTags(tags) {
 
     for (const tag of tags) {
         const li = document.createElement("li");
-        li.textContent = tag;
+        li.className = "custom-tags__item";
+
+        const icon = document.createElement("img");
+        icon.className = "icon icon--sm";
+        icon.src = "assets/img/icons/tag.svg";
+        icon.alt = "";
+        icon.setAttribute("aria-hidden", "true");
+
+        const label = document.createElement("span");
+        label.textContent = tag;
+
+        li.append(icon, label);
         customTagsListEl.appendChild(li);
     }
 }

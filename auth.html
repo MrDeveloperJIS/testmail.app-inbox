@@ -17,21 +17,19 @@
 
             <div id="auth-error" class="auth-error" role="alert" hidden></div>
 
-            <label class="field">
-                <span class="field__label">Email</span>
-                <input type="email" id="email" name="email" class="input" autocomplete="username" required />
-            </label>
+            <div class="float-field">
+                <input type="email" id="email" name="email" class="input float-field__input" placeholder=" " autocomplete="username" required />
+                <label for="email" class="float-field__label">Email</label>
+            </div>
 
-            <label class="field">
-                <span class="field__label">Password</span>
-                <div class="password-field">
-                    <input type="password" id="password" name="password" class="input" autocomplete="current-password" required />
-                    <button type="button" id="toggle-password" class="btn btn--icon password-field__toggle" aria-label="Show password" aria-pressed="false">
-                        <img id="icon-eye" class="icon" aria-hidden="true" src="assets/img/icons/eye.svg" alt="" />
-                        <img id="icon-eye-off" class="icon" aria-hidden="true" hidden src="assets/img/icons/eye-off.svg" alt="" />
-                    </button>
-                </div>
-            </label>
+            <div class="float-field">
+                <input type="password" id="password" name="password" class="input float-field__input float-field__input--toggle" placeholder=" " autocomplete="current-password" required />
+                <label for="password" class="float-field__label">Password</label>
+                <button type="button" id="toggle-password" class="btn btn--icon float-field__toggle" aria-label="Show password" aria-pressed="false">
+                    <img id="icon-eye" class="icon" aria-hidden="true" src="assets/img/icons/eye.svg" alt="" />
+                    <img id="icon-eye-off" class="icon" aria-hidden="true" hidden src="assets/img/icons/eye-off.svg" alt="" />
+                </button>
+            </div>
 
             <button type="submit" id="submit-btn" class="btn auth-card__submit">
                 <span id="submit-label">Sign in</span>

@@ -37,6 +37,7 @@ const readerEmptyEl = document.getElementById("reader-empty");
 const readerContentEl = document.getElementById("reader-content");
 const readerSubjectEl = document.getElementById("reader-subject");
 const readerFromEl = document.getElementById("reader-from");
+const readerToEl = document.getElementById("reader-to");
 const readerTagEl = document.getElementById("reader-tag");
 const readerTimestampEl = document.getElementById("reader-timestamp");
 const readerIframeEl = document.getElementById("reader-iframe");
@@ -242,15 +243,66 @@ function renderReaderContent(msg) {
 
     readerSubjectEl.textContent = msg.subject || "(no subject)";
     readerFromEl.textContent = msg.from || "";
+    readerToEl.textContent = formatRecipients(msg);
     readerTagEl.textContent = msg.tag || "";
     readerTimestampEl.textContent = new Date(msg.timestamp).toLocaleString();
 
-    readerIframeEl.srcdoc = msg.html || "";
+    readerIframeEl.srcdoc = msg.html ? withScrollbarStyle(msg.html) : "";
     readerTextEl.textContent = msg.text || "";
 
     const hasHtml = Boolean(msg.html);
     setReaderView(hasHtml ? "html" : "text");
     viewHtmlBtn.disabled = !hasHtml;
+}
+
+// ---- Reader helpers ------------------------------------------------------
+
+/**
+ * Builds the "To" line. Prefers the parsed recipient list from testmail.app,
+ * then the raw `to` / `envelope_to` strings, and finally reconstructs the
+ * address from the namespace + tag so the row is never blank.
+ */
+function formatRecipients(msg) {
+    if (Array.isArray(msg.to_parsed) && msg.to_parsed.length > 0) {
+        const list = msg.to_parsed
+            .map(({ address, name }) =>
+                address && name && name !== address ? `${name} <${address}>` : address || name
+            )
+            .filter(Boolean);
+        if (list.length > 0) return list.join(", ");
+    }
+    if (msg.to) return msg.to;
+    if (msg.envelope_to) return msg.envelope_to;
+    if (profile.namespace && msg.tag) {
+        return `${profile.namespace}.${msg.tag}@inbox.testmail.app`;
+    }
+    return "—";
+}
+
+/**
+ * The email body lives in its own iframe document, so the page's scrollbar
+ * styles don't reach it. Append a matching rule set (colours read from the
+ * base.css tokens, so nothing is hard-coded here). It goes at the end rather
+ * than the start so the email's own <!doctype> keeps standards mode.
+ */
+function withScrollbarStyle(html) {
+    const styles = getComputedStyle(document.documentElement);
+    const token = (name) => styles.getPropertyValue(name).trim();
+    const thumb = token("--scrollbar-thumb");
+    const hover = token("--scrollbar-thumb-hover");
+    const active = token("--scrollbar-thumb-active");
+
+    return `${html}<style>
+html{scrollbar-width:thin;scrollbar-color:${thumb} transparent}
+@supports selector(::-webkit-scrollbar){
+html{scrollbar-width:auto;scrollbar-color:auto}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track,::-webkit-scrollbar-corner{background:transparent}
+::-webkit-scrollbar-thumb{min-height:40px;background:${thumb};border:3px solid transparent;border-radius:999px;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:${hover};background-clip:padding-box}
+::-webkit-scrollbar-thumb:active{background:${active};background-clip:padding-box}
+}
+</style>`;
 }
 
 function setReaderView(mode) {

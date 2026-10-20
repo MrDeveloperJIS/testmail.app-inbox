@@ -19,7 +19,14 @@
 }
 
 .hero__icon {
-    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
 }
 
 .hero__title {
@@ -41,17 +48,33 @@
     text-underline-offset: 2px;
 }
 
-.hero__body {
-    margin: 0;
-    font-size: var(--font-size-base);
-    color: var(--text-secondary);
+.hero__address {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
 }
 
-.hero__body code {
-    background: var(--surface-alt);
+.hero__address-label {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.hero__address-text {
+    max-width: 100%;
+    font-size: var(--font-size-sm);
+    overflow-wrap: anywhere;
+}
+
+.hero__address-tag {
     padding: 0 var(--space-1);
+    background: var(--border);
     border-radius: 4px;
-    font-size: 0.85em;
 }
 
 .feature-list {
@@ -70,19 +93,44 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3);
-    background: var(--surface-alt);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: var(--font-size-sm);
+    transition: border-color var(--dur-fast) var(--ease);
 }
 
-.feature-list__item .icon {
+.feature-list__item:hover {
+    border-color: var(--grey-400);
+}
+
+.feature-list__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+}
+
+.feature-list__text {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+}
+
+.feature-list__text strong {
     color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-weight: 500;
 }
 
 .hero__cta {
     margin-top: var(--space-2);
-    min-width: 160px;
-    min-height: 42px;
+    width: 100%;
+    min-height: 44px;
 }
 
 /* Skeleton shown on the CTA while auth state is still resolving, to avoid
