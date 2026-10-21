@@ -84,10 +84,5 @@ testmail.app-inbox/
 - The Firebase web config in `firebase-config.js` is not a secret — it
   identifies the project, it doesn't authorize access. Security comes from
   the Firestore/RTDB rules, not from hiding this file.
-- `.private/guideline.md` holds the original build/design notes for this
-  project (data model, API details, phase-by-phase plan). It's kept out of
-  the deployed site via `.gitignore` and is reference material at this
-  point rather than a live spec — see `CHANGELOG.md` for where the app has
-  since diverged from it.
 
 See [CHANGELOG](./CHANGELOG.md) for version history.
