@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.5.0] - 2026-10-21
+
+### Added
+
+- **Multiple accounts** — a user can now hold several testmail.app accounts
+  (API key + namespace + optional label). Manage them from a new Accounts
+  panel on the profile page (add, edit, delete) and pick the active one; the
+  choice is saved in Firestore (`activeAccountId`) so it follows you across
+  devices.
+- **Sequential account ids** — accounts get short ids `A0`…`Z9` (260 max)
+  from a never-reused counter (`accountSeq`) instead of random ones.
+  Accounts already created with random ids keep working.
+- **`modules/accounts.js`** — shared profile normalisation and path helpers.
+
+### Changed
+
+- **Inbox** reads from the active account only; tag creation, the demo
+  address and the reader's "To" fallback all use its namespace.
+- **Tags are per account** — stored at `{uid}/accounts/{accountId}/tags/...`.
+  Profile overview (sequel count, custom tags) shows the active account.
+- Firestore profile doc is now `{ name, accounts[], activeAccountId }`.
+  The old single `api` / `namespace` fields and `{uid}/tags` data are no
+  longer read (no migration — re-add accounts). Security rules unchanged.
+
 ## [1.4.0] - 2026-10-20
 
 ### Added

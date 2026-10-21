@@ -18,9 +18,10 @@ no build step, no framework, just HTML/CSS/JS hosted on GitHub Pages.
   - *Custom* — your own text, validated and saved.
   - *Sequel* — auto-incrementing `AAA00`-style tags, previewed before
     you confirm creation.
-- **Profile** — view/edit your name, testmail API key (masked by default),
-  and namespace; see your custom tag history and how many sequel tags
-  you've generated.
+- **Multiple accounts** — add several API key + namespace accounts on the
+  profile page and pick the active one; the inbox and tags follow it.
+- **Profile** — edit your name, manage accounts (API keys masked), and see
+  the active account's custom tag history and sequel count.
 - **Dark theme only**, no toggle or light-mode branch.
 
 ## Tech stack
@@ -59,6 +60,7 @@ testmail.app-inbox/
     │       ├── testmail-api.js   # testmail.app fetch wrapper
     │       ├── tag-generator.js  # sequel tag generation/rollover
     │       ├── auth-guard.js     # redirect-if-signed-(in|out) helper
+    │       ├── accounts.js       # multi-account profile helpers + per-account tag paths
     │       └── utils.js          # debounce, escapeHtml, date formatting, masking
     └── img/icons/                # hand-rolled SVGs, referenced directly (no sprite)
 ```
@@ -74,8 +76,7 @@ testmail.app-inbox/
    no sign-up UI).
 4. Add your `*.github.io` domain to Firebase Auth's authorized domains, or
    sign-in will fail once deployed even though it works locally.
-5. In your Firestore `users/{uid}` document, set your testmail.app `api`
-   key and `namespace`.
+5. Sign in and add your testmail.app account(s) from the Profile page.
 6. Serve the repo root as static files (e.g. GitHub Pages).
 
 ## Notes

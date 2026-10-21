@@ -23,14 +23,14 @@
                     <img class="icon icon--lg" src="assets/img/icons/user.svg" alt="" />
                 </div>
                 <h1 class="profile__title">Profile</h1>
-                <p class="profile__lede">Your testmail.app credentials and tag activity.</p>
+                <p class="profile__lede">Your testmail.app accounts and tag activity.</p>
             </header>
 
             <section class="panel" aria-labelledby="account-title">
                 <div class="panel__header">
-                    <h2 id="account-title" class="panel__title">Account</h2>
+                    <h2 id="account-title" class="panel__title">Profile</h2>
                     <div class="profile-actions">
-                        <button id="edit-btn" class="btn btn--icon" aria-label="Edit profile" title="Edit">
+                        <button id="edit-btn" class="btn btn--icon" aria-label="Edit name" title="Edit">
                             <img class="icon" aria-hidden="true" src="assets/img/icons/edit.svg" alt="" />
                         </button>
                         <div id="edit-actions" class="edit-actions" hidden>
@@ -57,27 +57,41 @@
                             <label for="name-input" class="float-field__label">Name</label>
                         </div>
                     </div>
+                </form>
+            </section>
 
-                    <div class="profile-field">
-                        <div class="profile-field__view detail-row">
-                            <span class="detail-row__label">API key</span>
-                            <span id="api-value" class="detail-row__value"></span>
-                        </div>
-                        <div class="profile-field__edit float-field">
-                            <input id="api-input" class="input float-field__input" type="text" placeholder=" " autocomplete="off" />
-                            <label for="api-input" class="float-field__label">API key</label>
-                        </div>
+            <section class="panel" aria-labelledby="accounts-title">
+                <div class="panel__header">
+                    <h2 id="accounts-title" class="panel__title">Accounts</h2>
+                    <button id="add-account-btn" class="btn btn--icon" aria-label="Add account" title="Add account">
+                        <img class="icon" aria-hidden="true" src="assets/img/icons/add.svg" alt="" />
+                    </button>
+                </div>
+
+                <p class="panel__hint">The selected account is the one your inbox reads from.</p>
+
+                <ul id="account-list" class="account-list"></ul>
+                <p id="account-empty" class="custom-tags__empty">No accounts yet — add your testmail.app API key and namespace.</p>
+
+                <form id="account-form" class="account-form" novalidate hidden>
+                    <h3 id="account-form-title" class="account-form__title">New account</h3>
+                    <div class="float-field">
+                        <input id="account-label-input" class="input float-field__input" type="text" placeholder=" " autocomplete="off" />
+                        <label for="account-label-input" class="float-field__label">Label (optional)</label>
                     </div>
-
-                    <div class="profile-field">
-                        <div class="profile-field__view detail-row">
-                            <span class="detail-row__label">Namespace</span>
-                            <span id="namespace-value" class="detail-row__value"></span>
-                        </div>
-                        <div class="profile-field__edit float-field">
-                            <input id="namespace-input" class="input float-field__input" type="text" placeholder=" " autocomplete="off" />
-                            <label for="namespace-input" class="float-field__label">Namespace</label>
-                        </div>
+                    <div class="float-field">
+                        <input id="account-api-input" class="input float-field__input" type="text" placeholder=" " autocomplete="off" />
+                        <label for="account-api-input" class="float-field__label">API key</label>
+                    </div>
+                    <div class="float-field">
+                        <input id="account-namespace-input" class="input float-field__input" type="text" placeholder=" " autocomplete="off" />
+                        <label for="account-namespace-input" class="float-field__label">Namespace</label>
+                    </div>
+                    <p id="account-form-error" class="account-form__error" role="alert" hidden></p>
+                    <div class="account-form__actions">
+                        <button type="button" id="account-delete-btn" class="btn btn--ghost account-form__delete" hidden>Delete</button>
+                        <button type="button" id="account-cancel-btn" class="btn btn--ghost">Cancel</button>
+                        <button type="submit" id="account-save-btn" class="btn">Save account</button>
                     </div>
                 </form>
             </section>
@@ -85,6 +99,7 @@
             <section class="panel" aria-labelledby="overview-title">
                 <div class="panel__header">
                     <h2 id="overview-title" class="panel__title">Overview</h2>
+                    <span id="overview-account" class="panel__sub"></span>
                 </div>
 
                 <div class="detail-row">
@@ -105,6 +120,18 @@
             </button>
         </div>
     </main>
+
+    <!-- delete-account confirmation popup -->
+    <div id="confirm-backdrop" class="confirm-backdrop" hidden>
+        <div class="confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+            <h2 id="confirm-title" class="confirm__title">Delete account?</h2>
+            <p id="confirm-text" class="confirm__text"></p>
+            <div class="confirm__actions">
+                <button type="button" id="confirm-cancel-btn" class="btn btn--ghost">Cancel</button>
+                <button type="button" id="confirm-delete-btn" class="btn confirm__delete">Delete</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="assets/js/profile.js"></script>
 </body>

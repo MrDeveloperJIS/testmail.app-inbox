@@ -6,6 +6,12 @@ import { debounce, escapeHtml, formatRelativeTime } from "./modules/utils.js";
 import { fetchInbox } from "./modules/testmail-api.js";
 import { computeNextSequelTag, normalizeCustomTag } from "./modules/tag-generator.js";
 import {
+    normalizeProfile,
+    getActiveAccount,
+    accountName,
+    tagsPath,
+} from "./modules/accounts.js";
+import {
     doc,
     getDoc,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
@@ -73,7 +79,8 @@ const demoCopyFeedback = document.getElementById("demo-copy-feedback");
 // ---- State -------------------------------------------------------------
 
 let uid = null;
-let profile = { name: "", api: "", namespace: "" };
+let profile = { name: "", accounts: [], activeAccountId: "" };
+let account = null; // the active account (api + namespace) the inbox reads from
 let allMessages = []; // last fetch, up to 40, newest-first
 let filteredIndices = []; // indices into allMessages currently shown
 let selectedIndex = null; // index into allMessages
@@ -92,22 +99,28 @@ requireAuth(async (user) => {
 async function loadProfile() {
     try {
         const snap = await getDoc(doc(db, "users", uid));
-        if (snap.exists()) {
-            const data = snap.data();
-            profile = {
-                name: data.name || "",
-                api: data.api || "",
-                namespace: data.namespace || "",
-            };
-        }
+        if (snap.exists()) profile = normalizeProfile(snap.data());
     } catch (err) {
         showBanner("Couldn't load your profile — try refreshing the page.");
     }
 
-    if (!profile.api || !profile.namespace) {
-        showBanner("Add your testmail.app API key and namespace in Profile before refreshing.");
+    account = getActiveAccount(profile);
+
+    if (!account || !account.api || !account.namespace) {
+        showBanner("Add a testmail.app account in Profile before refreshing.");
         refreshBtn.disabled = true;
     }
+}
+
+// Coming back via the browser's back button can restore a stale page from
+// the bfcache (old account still selected) — reload so it re-reads the profile.
+window.addEventListener("pageshow", (e) => {
+    if (e.persisted) window.location.reload();
+});
+
+/** RTDB base path for the active account's tags (null when no account). */
+function tagsBase() {
+    return account ? tagsPath(uid, account.id) : null;
 }
 
 function showBanner(message) {
@@ -127,7 +140,7 @@ refreshBtn.addEventListener("click", () => {
 });
 
 async function refreshInbox() {
-    if (isFetching || !profile.api || !profile.namespace) return;
+    if (isFetching || !account || !account.api || !account.namespace) return;
 
     isFetching = true;
     refreshBtn.disabled = true;
@@ -136,8 +149,8 @@ async function refreshInbox() {
 
     try {
         const emails = await fetchInbox({
-            apiKey: profile.api,
-            namespace: profile.namespace,
+            apiKey: account.api,
+            namespace: account.namespace,
             limit: MESSAGE_LIMIT,
         });
         allMessages = emails;
@@ -154,9 +167,10 @@ async function refreshInbox() {
 }
 
 function updateInboxEmptyText() {
+    const where = account ? ` for ${accountName(account)}` : "";
     inboxEmptyTextEl.textContent =
         allMessages.length === 0
-            ? "No messages yet — hit refresh to check your inbox."
+            ? `No messages yet${where} — hit refresh to check your inbox.`
             : "No messages match your search.";
 }
 
@@ -273,8 +287,8 @@ function formatRecipients(msg) {
     }
     if (msg.to) return msg.to;
     if (msg.envelope_to) return msg.envelope_to;
-    if (profile.namespace && msg.tag) {
-        return `${profile.namespace}.${msg.tag}@inbox.testmail.app`;
+    if (account?.namespace && msg.tag) {
+        return `${account.namespace}.${msg.tag}@inbox.testmail.app`;
     }
     return "—";
 }
@@ -327,6 +341,10 @@ viewTextBtn.addEventListener("click", () => setReaderView("text"));
 // =========================================================================
 
 function openModal() {
+    if (!account) {
+        showBanner("Add a testmail.app account in Profile before creating tags.");
+        return;
+    }
     lastFocusedBeforeModal = document.activeElement;
     modalBackdrop.hidden = false;
     switchTab("custom");
@@ -375,7 +393,7 @@ tabSequelBtn.addEventListener("click", () => switchTab("sequel"));
 async function loadExistingCustomTags() {
     existingCustomTags = new Set();
     try {
-        const snap = await get(ref(rtdb, `${uid}/tags/custom`));
+        const snap = await get(ref(rtdb, `${tagsBase()}/custom`));
         if (snap.exists()) {
             existingCustomTags = new Set(Object.values(snap.val()));
         }
@@ -407,7 +425,7 @@ customTagCreateBtn.addEventListener("click", async () => {
 
     customTagCreateBtn.disabled = true;
     try {
-        await set(ref(rtdb, `${uid}/tags/custom/${Date.now()}`), result.tag);
+        await set(ref(rtdb, `${tagsBase()}/custom/${Date.now()}`), result.tag);
         showCreatedState(result.tag);
     } catch (err) {
         customTagHint.textContent = "Couldn't save the tag — try again.";
@@ -424,7 +442,7 @@ let sequelNextPreview = null;
 async function loadSequelPreview() {
     sequelPreviewEl.textContent = "…";
     try {
-        const snap = await get(ref(rtdb, `${uid}/tags/sequel/last`));
+        const snap = await get(ref(rtdb, `${tagsBase()}/sequel/last`));
         sequelLastKnown = snap.exists() ? snap.val() : null;
         sequelNextPreview = computeNextSequelTag(sequelLastKnown);
         sequelPreviewEl.textContent = sequelNextPreview;
@@ -439,7 +457,7 @@ sequelTagCreateBtn.addEventListener("click", async () => {
 
     sequelTagCreateBtn.disabled = true;
     try {
-        await set(ref(rtdb, `${uid}/tags/sequel/last`), sequelNextPreview);
+        await set(ref(rtdb, `${tagsBase()}/sequel/last`), sequelNextPreview);
         showCreatedState(sequelNextPreview);
     } catch (err) {
         sequelPreviewEl.textContent = "Couldn't create tag — try again.";
@@ -455,8 +473,8 @@ function showCreatedState(tag) {
     panelCreatedEl.hidden = false;
     modalTabsEl.hidden = true;
 
-    const address = profile.namespace
-        ? `${profile.namespace}.${tag}@inbox.testmail.app`
+    const address = account?.namespace
+        ? `${account.namespace}.${tag}@inbox.testmail.app`
         : tag;
     createdAddressText.textContent = address;
     copyFeedback.textContent = "";
@@ -485,8 +503,8 @@ const DEMO_TAG = "demo";
 let lastFocusedBeforeDemoModal = null;
 
 function demoAddress() {
-    return profile.namespace
-        ? `${profile.namespace}.${DEMO_TAG}@inbox.testmail.app`
+    return account?.namespace
+        ? `${account.namespace}.${DEMO_TAG}@inbox.testmail.app`
         : "";
 }
 
@@ -495,7 +513,7 @@ function openDemoModal() {
 
     const address = demoAddress();
     demoAddressText.textContent =
-        address || "Add your namespace in Profile first.";
+        address || "Add an account in Profile first.";
     demoCopyBtn.disabled = !address;
     demoCopyFeedback.textContent = "";
 

@@ -237,3 +237,206 @@
     min-width: 160px;
     min-height: 42px;
 }
+
+/* ---- Accounts ------------------------------------------------------------- */
+
+.panel__hint {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.panel__sub {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    overflow-wrap: anywhere;
+    text-align: right;
+}
+
+.account-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.account-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    background: var(--surface-alt);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    transition: border-color var(--dur-fast) var(--ease);
+}
+
+.account-item.is-active {
+    border-color: var(--grey-400);
+}
+
+.account-item__select {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.account-item__dot {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--grey-400);
+    border-radius: 50%;
+}
+
+.account-item.is-active .account-item__dot {
+    border-color: var(--accent);
+    background: var(--accent);
+}
+
+.account-item__text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.account-item__title {
+    font-size: var(--font-size-base);
+    overflow-wrap: anywhere;
+}
+
+.account-item__meta {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    overflow-wrap: anywhere;
+}
+
+.account-item__actions {
+    display: flex;
+    flex-shrink: 0;
+    padding-right: var(--space-1);
+}
+
+.account-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.account-form__title {
+    margin: 0 0 var(--space-1);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+}
+
+.account-form__error {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.account-form__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+
+/* Edit pen: shown on hover / keyboard focus where hover exists; always
+   visible on touch devices (no hover to reveal it). */
+@media (hover: hover) {
+    .account-item__actions .btn {
+        opacity: 0;
+        transition: opacity var(--dur-fast) var(--ease);
+    }
+
+    .account-item:hover .account-item__actions .btn,
+    .account-item:focus-within .account-item__actions .btn {
+        opacity: 1;
+    }
+}
+
+.account-form__delete {
+    margin-right: auto;
+    border-color: var(--danger);
+}
+
+.account-form__delete:hover {
+    background: var(--danger);
+}
+
+/* ---- Delete confirmation popup -------------------------------------------- */
+
+.confirm-backdrop {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    background: var(--backdrop);
+    z-index: 100;
+    animation: confirm-fade var(--dur-base) var(--ease);
+}
+
+.confirm {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    animation: confirm-pop var(--dur-base) var(--ease);
+}
+
+.confirm__title {
+    margin: 0;
+    font-size: var(--font-size-md);
+    font-weight: 600;
+}
+
+.confirm__text {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    overflow-wrap: anywhere;
+}
+
+.confirm__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+
+.confirm__delete {
+    background: var(--danger);
+    color: var(--text-primary);
+}
+
+@keyframes confirm-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes confirm-pop {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
