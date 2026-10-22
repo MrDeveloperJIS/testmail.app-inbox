@@ -196,6 +196,12 @@ a {
     border-color: var(--grey-500);
 }
 
+@media (max-width: 640px) {
+    input[type] {
+        font-size: 16px;
+    }
+}
+
 /* ---- Scrollbars --------------------------------------------------------
    Thin, rounded, transparent-track scrollbars that follow the greyscale.
    Chromium/Safari get the ::-webkit-scrollbar version (adds hover/active

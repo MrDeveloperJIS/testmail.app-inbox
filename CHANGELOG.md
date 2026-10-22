@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.6.0] - 2026-10-22
+
+### Added
+
+- **Auto fetch** — the inbox fetches once, 5 seconds after page load (and once
+  the profile has loaded). It never repeats; a manual refresh before then
+  cancels it.
+- **Load more** — fetches the next 40 messages via testmail.app's `offset`
+  parameter; repeats from overlapping pages are skipped.
+- **Unread state** — unopened messages are bold with a dot. Each fetched message
+  is recorded in Realtime Database at
+  `{uid}/accounts/{accountId}/messages/{messageKey}` as `{ received, read? }`:
+  the fetch stores `received` when the id is new, opening the message adds
+  `read`, and an id with a `read` timestamp shows as read on every device. A
+  `localStorage` cache keeps it instant/offline. Entries are deleted 72 hours
+  after `received` (testmail.app keeps mail for 3 days); the sweep runs on page
+  load and manual refresh.
+- **Mobile back button** — top-bar arrow returns from the reader to the list
+  and restores the list's scroll position.
+- **Security rules** documented in the README, plus the authorized domain and
+  an optional API key referrer restriction.
+
+### Changed
+
+- **Search** now also matches sender and body text; every word must match.
+- **Relative times** are re-rendered client-side every 30 seconds (no refetch).
+- **Mobile layout** — dynamic viewport height, two-row top bar with 44px touch
+  targets, full-width search, a reader pane that scrolls as a whole, and 16px
+  inputs so iOS doesn't zoom on focus.
+- `fetchInbox` takes an `offset` and returns `{ emails, total }`.
+
 ## [1.5.0] - 2026-10-21
 
 ### Added

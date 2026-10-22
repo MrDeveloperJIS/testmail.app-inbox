@@ -4,6 +4,7 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
 }
 
 /* ---- Top bar ------------------------------------------------------------ */
@@ -46,6 +47,10 @@
     margin-left: auto;
 }
 
+.topbar__back {
+    display: none;
+}
+
 .topbar__avatar {
     display: block;
     width: 20px;
@@ -79,6 +84,8 @@
 }
 
 .inbox__list-pane {
+    display: flex;
+    flex-direction: column;
     border-right: 1px solid var(--border);
     overflow-y: auto;
     position: relative;
@@ -92,6 +99,7 @@
 /* ---- Message list --------------------------------------------------------*/
 
 .message-list {
+    flex: 0 0 auto;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -141,6 +149,26 @@
     flex-shrink: 0;
 }
 
+.message-row.is-unread .message-row__tag {
+    color: var(--text-primary);
+}
+
+.message-row.is-unread .message-row__tag::before {
+    content: "";
+    display: inline-block;
+    position: relative;
+    top: -1px;
+    width: 8px;
+    height: 8px;
+    margin-right: var(--space-2);
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.message-row.is-unread .message-row__subject {
+    font-weight: 700;
+}
+
 .message-row__subject {
     font-size: var(--font-size-base);
     font-weight: 500;
@@ -166,7 +194,6 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-3);
-    height: 100%;
     padding: var(--space-6);
     text-align: center;
     color: var(--text-secondary);
@@ -178,9 +205,25 @@
     display: flex;
 }
 
+.inbox-empty {
+    flex: 1;
+    min-height: 160px;
+}
+
 .reader-empty {
     position: absolute;
     inset: 0;
+}
+
+/* ---- Load more ------------------------------------------------------------ */
+
+.inbox-more {
+    flex-shrink: 0;
+    padding: var(--space-3) var(--space-4);
+}
+
+.inbox-more .btn {
+    width: 100%;
 }
 
 /* ---- Reader pane ----------------------------------------------------- */
@@ -423,6 +466,36 @@
 }
 
 @media (max-width: 640px) {
+
+    /* Top bar: actions on row 1, full-width search on row 2. While a message
+       is open, the search row is replaced by the back button on row 1. */
+    .topbar {
+        flex-wrap: wrap;
+        gap: var(--space-1);
+        padding: var(--space-2) var(--space-3);
+    }
+
+    .topbar__action {
+        padding: var(--space-3);
+        /* 20px icon + 24px padding = 44px touch target */
+    }
+
+    .topbar__search {
+        order: 1;
+        flex: 1 0 100%;
+        margin: var(--space-1) 0 0;
+        padding: var(--space-3);
+    }
+
+    .inbox-page.is-reading .topbar__back {
+        display: inline-flex;
+    }
+
+    .inbox-page.is-reading .topbar__search {
+        display: none;
+    }
+
+    /* Single pane at a time. */
     .inbox {
         grid-template-columns: 1fr;
     }
@@ -441,5 +514,50 @@
 
     .inbox.is-reading .inbox__reader-pane {
         display: block;
+    }
+
+    /* Reader: the whole pane scrolls instead of squeezing the message into
+       whatever height is left under a tall header (e.g. landscape phones). */
+    .reader-content {
+        height: auto;
+        min-height: 100%;
+        padding: var(--space-3);
+        gap: var(--space-3);
+    }
+
+    .reader-content__header {
+        gap: var(--space-2);
+        padding-bottom: var(--space-3);
+    }
+
+    .reader-content__subject {
+        font-size: var(--font-size-md);
+        overflow-wrap: anywhere;
+    }
+
+    .reader-meta {
+        gap: 2px var(--space-3);
+    }
+
+    .view-toggle__btn {
+        padding: var(--space-2) var(--space-4);
+    }
+
+    .reader-iframe {
+        flex: 1 0 auto;
+        min-height: 60vh;
+        min-height: 60dvh;
+    }
+
+    .reader-text {
+        flex: 1 0 auto;
+        min-height: 40vh;
+        min-height: 40dvh;
+        overflow-y: visible;
+    }
+
+    .message-row {
+        padding: var(--space-3);
+        padding-left: calc(var(--space-3) - 3px);
     }
 }

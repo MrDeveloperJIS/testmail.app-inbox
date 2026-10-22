@@ -72,6 +72,11 @@ export function tagsPath(uid, accountId) {
     return `${uid}/accounts/${accountId}/tags`;
 }
 
+/** RTDB path for one account's message states ({messageKey: {received, read?}}). */
+export function messagesPath(uid, accountId) {
+    return `${uid}/accounts/${accountId}/messages`;
+}
+
 /** The plain object that gets written to Firestore. */
 export function toDoc(profile) {
     return {

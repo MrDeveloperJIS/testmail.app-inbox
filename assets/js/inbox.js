@@ -1,15 +1,30 @@
 // inbox.js — core inbox page.
 
-import { auth, db, rtdb } from "./firebase-config.js";
-import { requireAuth } from "./modules/auth-guard.js";
-import { debounce, escapeHtml, formatRelativeTime } from "./modules/utils.js";
-import { fetchInbox } from "./modules/testmail-api.js";
-import { computeNextSequelTag, normalizeCustomTag } from "./modules/tag-generator.js";
+import {
+    db,
+    rtdb
+} from "./firebase-config.js";
+import {
+    requireAuth
+} from "./modules/auth-guard.js";
+import {
+    debounce,
+    escapeHtml,
+    formatRelativeTime
+} from "./modules/utils.js";
+import {
+    fetchInbox
+} from "./modules/testmail-api.js";
+import {
+    computeNextSequelTag,
+    normalizeCustomTag
+} from "./modules/tag-generator.js";
 import {
     normalizeProfile,
     getActiveAccount,
     accountName,
     tagsPath,
+    messagesPath,
 } from "./modules/accounts.js";
 import {
     doc,
@@ -19,10 +34,17 @@ import {
     ref,
     get,
     set,
+    update,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 
-const MESSAGE_LIMIT = 40;
+const MESSAGE_LIMIT = 40; // page size for both the first load and "Load more"
 const SEARCH_DEBOUNCE_MS = 180;
+const AUTO_FETCH_DELAY_MS = 5000; // single auto fetch after page load
+const RELATIVE_TIME_TICK_MS = 30000; // re-render "3m ago" labels, no network
+const READ_STORE_PREFIX = "tmi:read:"; // localStorage cache: tmi:read:{uid}:{accountId}
+// testmail.app keeps mail for 3 days, so a message entry is useless after that.
+// One extra hour absorbs clock differences between devices and the server.
+const READ_TTL_MS = 73 * 60 * 60 * 1000;
 
 // ---- DOM refs --------------------------------------------------------------
 
@@ -31,6 +53,12 @@ const demoTagBtn = document.getElementById("demo-tag-btn");
 const refreshBtn = document.getElementById("refresh-btn");
 const refreshIcon = document.getElementById("refresh-icon");
 const searchInput = document.getElementById("search-input");
+const backBtn = document.getElementById("back-btn");
+const pageEl = document.querySelector(".inbox-page");
+const listPaneEl = document.querySelector(".inbox__list-pane");
+const readerPaneEl = document.querySelector(".inbox__reader-pane");
+const loadMoreWrapEl = document.getElementById("load-more-wrap");
+const loadMoreBtn = document.getElementById("load-more-btn");
 
 const banner = document.getElementById("inbox-banner");
 
@@ -81,10 +109,19 @@ const demoCopyFeedback = document.getElementById("demo-copy-feedback");
 let uid = null;
 let profile = { name: "", accounts: [], activeAccountId: "" };
 let account = null; // the active account (api + namespace) the inbox reads from
-let allMessages = []; // last fetch, up to 40, newest-first
+let allMessages = []; // fetched so far (first page + any "Load more"), newest-first
+let searchIndex = []; // lowercase searchable text, parallel to allMessages
 let filteredIndices = []; // indices into allMessages currently shown
 let selectedIndex = null; // index into allMessages
+let fetchedCount = 0; // emails the server has returned so far = next `offset`
+let hasMore = false; // whether "Load more" should be offered
 let isFetching = false;
+let readMap = new Map(); // db key -> { received, read? } timestamps in ms (see read state)
+let readSync = Promise.resolve(); // the latest syncReadState() run
+let listScrollTop = 0; // list scroll position to restore on mobile "back"
+let autoFetchTimerElapsed = false;
+let profileReady = false;
+let autoFetchDone = false;
 let lastFocusedBeforeModal = null;
 let existingCustomTags = new Set();
 
@@ -94,6 +131,8 @@ requireAuth(async (user) => {
     uid = user.uid;
     await loadProfile();
     applyFilter(searchInput.value);
+    profileReady = true;
+    maybeAutoFetch();
 });
 
 async function loadProfile() {
@@ -105,6 +144,8 @@ async function loadProfile() {
     }
 
     account = getActiveAccount(profile);
+    readMap = loadReadCache();
+    syncReadState(); // background: merge with RTDB, no need to wait for it
 
     if (!account || !account.api || !account.namespace) {
         showBanner("Add a testmail.app account in Profile before refreshing.");
@@ -133,61 +174,136 @@ function hideBanner() {
     banner.textContent = "";
 }
 
-// ---- Refresh / fetch --------------------------------------------------
+// ---- Refresh / fetch / load more -------------------------------------------
 
 refreshBtn.addEventListener("click", () => {
-    refreshInbox();
+    loadMessages({ append: false });
 });
 
-async function refreshInbox() {
+loadMoreBtn.addEventListener("click", () => {
+    loadMessages({ append: true });
+});
+
+/**
+ * Fetches one page of messages. `append: false` replaces the list with the
+ * newest page (refresh); `append: true` asks testmail.app for the next page
+ * via `offset` and adds it to the end of the list.
+ */
+async function loadMessages({ append, syncRead = true }) {
     if (isFetching || !account || !account.api || !account.namespace) return;
+
+    // Any fetch, manual or automatic, uses up the one-time auto fetch.
+    autoFetchDone = true;
 
     isFetching = true;
     refreshBtn.disabled = true;
-    refreshIcon.classList.add("spin");
+    loadMoreBtn.disabled = true;
+    if (append) loadMoreBtn.textContent = "Loading…";
+    else refreshIcon.classList.add("spin");
     hideBanner();
 
+    // A manual refresh also pulls read state, so reads made on other devices show up.
+    if (!append && syncRead) syncReadState();
+
+    const offset = append ? fetchedCount : 0;
+
     try {
-        const emails = await fetchInbox({
+        const { emails, total } = await fetchInbox({
             apiKey: account.api,
             namespace: account.namespace,
             limit: MESSAGE_LIMIT,
+            offset,
         });
-        allMessages = emails;
-        selectedIndex = null;
-        renderReaderEmpty();
+
+        if (append) {
+            // New mail arriving between pages shifts offsets, so skip repeats.
+            const seen = new Set(allMessages.map(messageKey));
+            const fresh = emails.filter((m) => !seen.has(messageKey(m)));
+            allMessages = allMessages.concat(fresh);
+            searchIndex = searchIndex.concat(fresh.map(buildSearchText));
+            registerReceived(fresh);
+        } else {
+            allMessages = emails;
+            searchIndex = emails.map(buildSearchText);
+            registerReceived(emails);
+            selectedIndex = null;
+            renderReaderEmpty();
+        }
+
+        fetchedCount = offset + emails.length;
+        hasMore =
+            emails.length > 0 &&
+            (total !== null ? fetchedCount < total : emails.length === MESSAGE_LIMIT);
+
         applyFilter(searchInput.value);
     } catch (err) {
         showBanner(err.message);
     } finally {
         isFetching = false;
         refreshBtn.disabled = false;
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = "Load more";
         refreshIcon.classList.remove("spin");
     }
 }
 
-function updateInboxEmptyText() {
-    const where = account ? ` for ${accountName(account)}` : "";
-    inboxEmptyTextEl.textContent =
-        allMessages.length === 0
-            ? `No messages yet${where} — hit refresh to check your inbox.`
-            : "No messages match your search.";
+// ---- One-time auto fetch -------------------------------------------------
+// Runs once, AUTO_FETCH_DELAY_MS after page load and only after the profile
+// has loaded. It never repeats; a manual refresh before it fires cancels it.
+
+setTimeout(() => {
+    autoFetchTimerElapsed = true;
+    maybeAutoFetch();
+}, AUTO_FETCH_DELAY_MS);
+
+function maybeAutoFetch() {
+    if (autoFetchDone || !autoFetchTimerElapsed || !profileReady) return;
+    autoFetchDone = true;
+    loadMessages({ append: false, syncRead: false }); // profile load already synced
 }
 
-// ---- Rendering: message list --------------------------------------------
+function updateInboxEmptyText() {
+    const where = account ? ` for ${accountName(account)}` : "";
+    if (allMessages.length === 0) {
+        inboxEmptyTextEl.textContent = `No messages yet${where} — hit refresh to check your inbox.`;
+    } else if (hasMore) {
+        inboxEmptyTextEl.textContent = "No loaded messages match — load more to search older mail.";
+    } else {
+        inboxEmptyTextEl.textContent = "No messages match your search.";
+    }
+}
+
+// ---- Search ----------------------------------------------------------------
+
+/** Stable per-message key (testmail.app `id`, with a fallback). */
+function messageKey(msg) {
+    return String(msg.id || `${msg.timestamp}|${msg.tag}|${msg.subject}`);
+}
+
+function stripHtml(html) {
+    if (!html) return "";
+    return html
+        .replace(/<(style|script)[\s\S]*?<\/\1>/gi, " ")
+        .replace(/<[^>]*>/g, " ")
+        .replace(/&nbsp;/gi, " ");
+}
+
+/** Lowercased tag + subject + sender + body, built once per message. */
+function buildSearchText(msg) {
+    const parts = [msg.tag, msg.subject, msg.from];
+    if (Array.isArray(msg.from_parsed)) {
+        for (const p of msg.from_parsed) parts.push(p?.name, p?.address);
+    }
+    parts.push(msg.text || stripHtml(msg.html));
+    return parts.filter(Boolean).join(" ").replace(/\s+/g, " ").toLowerCase();
+}
 
 function applyFilter(query) {
-    const q = query.trim().toLowerCase();
+    // Every word must appear somewhere in the message (order doesn't matter).
+    const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
     filteredIndices = allMessages
         .map((_, i) => i)
-        .filter((i) => {
-            if (!q) return true;
-            const msg = allMessages[i];
-            return (
-                (msg.tag || "").toLowerCase().includes(q) ||
-                (msg.subject || "").toLowerCase().includes(q)
-            );
-        });
+        .filter((i) => terms.every((t) => searchIndex[i].includes(t)));
 
     if (selectedIndex !== null && !filteredIndices.includes(selectedIndex)) {
         selectedIndex = null;
@@ -206,21 +322,205 @@ searchInput.addEventListener("input", (e) => {
     handleSearchInput(e.target.value);
 });
 
+// ---- Read / unread state -----------------------------------------------------
+// Every fetched message gets an entry in RTDB at
+//   {uid}/accounts/{accountId}/messages/{messageKey} = { received, read? }
+// `received` is the mail's own timestamp, stored by the fetch the first time
+// the message is seen. `read` is set when the message is opened. A message is
+// read when its entry has a `read` timestamp, otherwise unread. Because it is
+// in RTDB, the state follows you across devices; localStorage mirrors it as an
+// instant/offline cache.
+// Entries whose `received` is older than READ_TTL_MS are deleted (testmail.app
+// has dropped the mail by then). RTDB has no TTL, so the sweep runs from
+// syncReadState() on page load and manual refresh.
+
+/** Message key made safe for an RTDB key (no . $ # [ ] / or control chars). */
+function readDbKey(msg) {
+    return messageKey(msg)
+        .replace(/[.$#\[\]\/\u0000-\u001f\u007f]/g, "_")
+        .slice(0, 200);
+}
+
+function isRead(msg) {
+    return typeof readMap.get(readDbKey(msg))?.read === "number";
+}
+
+function isTs(v) {
+    return typeof v === "number" && Number.isFinite(v);
+}
+
+/** Validates one stored entry; returns { received, read? } or null. */
+function cleanEntry(v) {
+    if (!v || typeof v !== "object") return null;
+    const received = isTs(v.received) ? v.received : isTs(v.read) ? v.read : null;
+    if (received === null) return null;
+    const entry = { received };
+    if (isTs(v.read)) entry.read = v.read;
+    return entry;
+}
+
+function readStoreKey() {
+    return uid && account ? `${READ_STORE_PREFIX}${uid}:${account.id}` : null;
+}
+
+function loadReadCache() {
+    const key = readStoreKey();
+    const map = new Map();
+    if (!key) return map;
+    try {
+        const stored = JSON.parse(localStorage.getItem(key) || "{}");
+        if (stored && typeof stored === "object" && !Array.isArray(stored)) {
+            const cutoff = Date.now() - READ_TTL_MS;
+            for (const [k, v] of Object.entries(stored)) {
+                const entry = cleanEntry(v);
+                if (entry && entry.received >= cutoff) map.set(k, entry);
+            }
+        }
+    } catch (err) {
+        // Unreadable cache: start empty; RTDB will refill it.
+    }
+    return map;
+}
+
+function saveReadCache() {
+    const key = readStoreKey();
+    if (!key) return;
+    try {
+        localStorage.setItem(key, JSON.stringify(Object.fromEntries(readMap)));
+    } catch (err) {
+        // Storage unavailable/full: read state still works for this session.
+    }
+}
+
+/**
+ * Merges RTDB and the local cache, deletes expired RTDB entries, and uploads
+ * whatever RTDB is missing (e.g. a write that failed while offline).
+ * Resolves when done; never rejects.
+ */
+function syncReadState() {
+    readSync = runReadSync();
+    return readSync;
+}
+
+async function runReadSync() {
+    const base = account ? messagesPath(uid, account.id) : null;
+    if (!base) return;
+
+    try {
+        const snap = await get(ref(rtdb, base));
+        const remote = snap.exists() ? snap.val() : {};
+        const cutoff = Date.now() - READ_TTL_MS;
+        const changes = {};
+        const expired = new Set();
+        const remoteClean = new Map();
+
+        for (const [k, v] of Object.entries(remote)) {
+            const entry = cleanEntry(v);
+            if (!entry || entry.received < cutoff) {
+                changes[k] = null; // expired or malformed
+                expired.add(k);
+            } else {
+                remoteClean.set(k, entry);
+            }
+        }
+
+        // Remote wins for what it has; local fills the gaps.
+        for (const [k, entry] of remoteClean) {
+            const local = readMap.get(k);
+            const merged = { received: entry.received };
+            const read = entry.read ?? local?.read;
+            if (read !== undefined) merged.read = read;
+            readMap.set(k, merged);
+        }
+
+        for (const [k, local] of [...readMap]) {
+            if (expired.has(k) || local.received < cutoff) {
+                readMap.delete(k);
+                continue;
+            }
+            const rem = remoteClean.get(k);
+            if (!rem || !isTs(remote[k]?.received)) changes[`${k}/received`] = local.received;
+            if (local.read !== undefined && !isTs(remote[k]?.read)) changes[`${k}/read`] = local.read;
+        }
+
+        if (Object.keys(changes).length > 0) await update(ref(rtdb, base), changes);
+    } catch (err) {
+        // Offline or rules problem: keep working from the local cache.
+    }
+
+    saveReadCache();
+    renderMessageList();
+}
+
+/**
+ * Called after a fetch. Any message without an entry gets one with its
+ * `received` timestamp (so it stays unread until opened). Entries that already
+ * exist, including ones with a `read` timestamp, are left alone.
+ */
+async function registerReceived(messages) {
+    await readSync; // know what RTDB already has before deciding what is new
+    const base = account ? messagesPath(uid, account.id) : null;
+    if (!base) return;
+
+    const cutoff = Date.now() - READ_TTL_MS;
+    const changes = {};
+    for (const msg of messages) {
+        const received = Number(msg.timestamp);
+        if (!isTs(received) || received < cutoff) continue;
+        const key = readDbKey(msg);
+        if (readMap.has(key)) continue;
+        readMap.set(key, { received });
+        changes[`${key}/received`] = received;
+    }
+    if (Object.keys(changes).length === 0) return;
+
+    saveReadCache();
+    try {
+        await update(ref(rtdb, base), changes);
+    } catch (err) {
+        // Retried by the next syncReadState().
+    }
+}
+
+/** Marks a message read. @returns {boolean} true if it was previously unread. */
+function markRead(msg) {
+    const key = readDbKey(msg);
+    const entry = readMap.get(key) || { received: Number(msg.timestamp) || Date.now() };
+    if (isTs(entry.read)) return false;
+
+    entry.read = Date.now();
+    readMap.set(key, entry);
+    saveReadCache();
+
+    if (account) {
+        // Fire and forget: a failed write is retried by the next syncReadState().
+        update(ref(rtdb, messagesPath(uid, account.id)), {
+            [`${key}/received`]: entry.received,
+            [`${key}/read`]: entry.read,
+        }).catch(() => { });
+    }
+    return true;
+}
+
+// ---- Rendering: message list --------------------------------------------
+
 function renderMessageList() {
     messageListEl.innerHTML = "";
 
     const hasResults = filteredIndices.length > 0;
     inboxEmptyEl.classList.toggle("is-visible", !hasResults);
     messageListEl.hidden = !hasResults;
+    loadMoreWrapEl.hidden = !hasMore;
 
     for (const i of filteredIndices) {
         const msg = allMessages[i];
+        const isUnread = !isRead(msg);
         const li = document.createElement("li");
         li.innerHTML = `
-      <button type="button" class="message-row${i === selectedIndex ? " is-selected" : ""}" data-index="${i}">
+      <button type="button" class="message-row${i === selectedIndex ? " is-selected" : ""}${isUnread ? " is-unread" : ""}" data-index="${i}">
         <div class="message-row__top">
-          <span class="message-row__tag">${escapeHtml(msg.tag || "")}</span>
-          <span class="message-row__time">${escapeHtml(formatRelativeTime(msg.timestamp))}</span>
+          <span class="message-row__tag">${isUnread ? '<span class="visually-hidden">Unread. </span>' : ""}${escapeHtml(msg.tag || "")}</span>
+          <span class="message-row__time" data-ts="${Number(msg.timestamp) || 0}">${escapeHtml(formatRelativeTime(msg.timestamp))}</span>
         </div>
         <span class="message-row__subject">${escapeHtml(msg.subject || "(no subject)")}</span>
         <span class="message-row__from">${escapeHtml(msg.from || "")}</span>
@@ -236,19 +536,44 @@ messageListEl.addEventListener("click", (e) => {
     selectMessage(Number(btn.dataset.index));
 });
 
+// ---- Relative time (client-side only, no refetch) -----------------------------
+
+function refreshRelativeTimes() {
+    const now = new Date();
+    for (const el of messageListEl.querySelectorAll(".message-row__time")) {
+        el.textContent = formatRelativeTime(Number(el.dataset.ts), now);
+    }
+}
+
+setInterval(refreshRelativeTimes, RELATIVE_TIME_TICK_MS);
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) refreshRelativeTimes();
+});
+
 // ---- Rendering: reader pane ----------------------------------------------
 
+/** Mobile: swaps between list pane and reader pane (and shows the back button). */
+function setReading(isReading) {
+    inboxEl.classList.toggle("is-reading", isReading);
+    pageEl.classList.toggle("is-reading", isReading);
+}
+
 function selectMessage(index) {
+    if (!inboxEl.classList.contains("is-reading")) {
+        listScrollTop = listPaneEl.scrollTop; // restored by the back button
+    }
     selectedIndex = index;
+    markRead(allMessages[index]);
     renderMessageList();
     renderReaderContent(allMessages[index]);
-    inboxEl.classList.add("is-reading"); // mobile: swap to reader pane
+    readerPaneEl.scrollTop = 0;
+    setReading(true);
 }
 
 function renderReaderEmpty() {
     readerEmptyEl.hidden = false;
     readerContentEl.hidden = true;
-    inboxEl.classList.remove("is-reading");
+    setReading(false);
 }
 
 function renderReaderContent(msg) {
@@ -330,11 +655,14 @@ function setReaderView(mode) {
 viewHtmlBtn.addEventListener("click", () => setReaderView("html"));
 viewTextBtn.addEventListener("click", () => setReaderView("text"));
 
-// Mobile: tapping back out of the reader pane returns to the list. We reuse
-// the profile link area minimally — simplest is a swipe-free back via list
-// pane always being reachable through browser back is out of scope; instead
-// clicking the (already visible) top bar search/new-tag areas is unaffected
-// since .is-reading only hides panes below the top bar.
+// Mobile: the top-bar back button returns from the reader to the list,
+// restoring the list's scroll position.
+backBtn.addEventListener("click", () => {
+    selectedIndex = null;
+    renderReaderEmpty();
+    renderMessageList();
+    listPaneEl.scrollTop = listScrollTop;
+});
 
 // =========================================================================
 // New Tag modal

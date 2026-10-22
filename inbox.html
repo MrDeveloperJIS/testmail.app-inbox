@@ -13,6 +13,10 @@
 <body>
     <div class="inbox-page">
         <header class="topbar">
+            <button id="back-btn" class="btn btn--icon topbar__action topbar__back" aria-label="Back to messages">
+                <img class="icon" aria-hidden="true" src="assets/img/icons/back.svg" alt="" />
+            </button>
+
             <button id="new-tag-btn" class="btn btn--icon topbar__action" aria-label="New tag">
                 <img class="icon" aria-hidden="true" src="assets/img/icons/add.svg" alt="" />
             </button>
@@ -27,7 +31,7 @@
 
             <label class="topbar__search">
                 <img class="icon icon--sm" aria-hidden="true" src="assets/img/icons/search.svg" alt="" />
-                <input id="search-input" type="search" class="topbar__search-input" placeholder="Search tag or subject" aria-label="Search messages" />
+                <input id="search-input" type="search" class="topbar__search-input" placeholder="Search mail" aria-label="Search messages" />
             </label>
 
             <a href="profile.html" class="btn btn--icon topbar__action topbar__profile" aria-label="Profile">
@@ -44,6 +48,10 @@
                 <div id="inbox-empty" class="inbox-empty">
                     <img class="icon icon--lg" aria-hidden="true" src="assets/img/icons/mail.svg" alt="" />
                     <p id="inbox-empty-text">No messages yet — hit refresh to check your inbox.</p>
+                </div>
+
+                <div id="load-more-wrap" class="inbox-more" hidden>
+                    <button id="load-more-btn" type="button" class="btn btn--ghost">Load more</button>
                 </div>
             </section>
 
